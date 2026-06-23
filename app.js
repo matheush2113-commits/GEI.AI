@@ -653,7 +653,7 @@ const SHELVES = {
 };
 const SHELF_KEYS = Object.keys(SHELVES);
 const SHELF_LABEL = {
-  bebida: 'Bebidas', macarrao: 'Mercearia/Grãos', pesado: 'Pesado',
+  bebida: 'Bebidas', macarrao: 'Macarrão/Leite', pesado: 'Pesado',
   frios: 'Frios', biscoito: 'Biscoito',
 };
 const SHELF_ALIAS = {
@@ -665,46 +665,67 @@ const SHELF_ALIAS = {
 const AREA_PERFIS = ['deposito', 'coordenador', 'repositor'];
 const ALL_ROLES = ['Repositor', 'Deposito', 'Coordenador'];
 
-// ─── TEMAS ─────────────────────────────────────────────────────────────────
+// ─── TEMAS — REDESENHADOS (paleta "Aurora") ────────────────────────────────
+// Nova identidade visual: violeta+âmbar (antes era azul puro), fundos com
+// leve tingimento de cor, bordas mais suaves, mais contraste tipográfico.
+// Todas as chaves originais foram preservadas para não quebrar nenhum
+// componente que consome T.*, e foi adicionado um 4º tema (sunset).
 const THEMES = {
   light: {
     name: 'Claro', icon: 'sun',
-    bg: '#F0F4FF', bgCard: '#FFFFFF', bgElevated: '#E8EEFF', bgInput: '#EEF1FB',
-    blue: '#3B5BFF', blueMid: 'rgba(59,91,255,0.14)', blueGlow: 'rgba(59,91,255,0.08)',
-    teal: '#0EA5A0', tealGlow: 'rgba(14,165,160,0.08)',
-    purple: '#7C3AED', purpleGlow: 'rgba(124,58,237,0.08)',
-    orange: '#EA580C', orangeGlow: 'rgba(234,88,12,0.08)',
+    bg: '#F7F6FB', bgCard: '#FFFFFF', bgElevated: '#F0EDFB', bgInput: '#F3F1FA',
+    blue: '#6D4AFF', blueMid: 'rgba(109,74,255,0.14)', blueGlow: 'rgba(109,74,255,0.08)',
+    teal: '#0D9488', tealGlow: 'rgba(13,148,136,0.08)',
+    purple: '#9333EA', purpleGlow: 'rgba(147,51,234,0.08)',
+    orange: '#F59E0B', orangeGlow: 'rgba(245,158,11,0.1)',
     green: '#16A34A', greenSolid: '#15803D', greenGlow: 'rgba(22,163,74,0.1)',
-    red: '#DC2626', redSolid: '#B91C1C', redGlow: 'rgba(220,38,38,0.08)',
+    red: '#E11D48', redSolid: '#BE123C', redGlow: 'rgba(225,29,72,0.08)',
     amber: '#D97706', amberSolid: '#B45309', amberGlow: 'rgba(217,119,6,0.1)',
-    text: '#0F172A', textSub: '#5A6A8A', textMuted: '#94A3B8',
-    border: 'rgba(59,91,255,0.08)', borderMid: 'rgba(59,91,255,0.16)',
+    text: '#161324', textSub: '#665E80', textMuted: '#A39CBD',
+    border: 'rgba(109,74,255,0.10)', borderMid: 'rgba(109,74,255,0.20)',
+    accent: '#6D4AFF', accentSoft: '#F59E0B',
   },
   dark: {
     name: 'Escuro', icon: 'moon',
-    bg: '#060B18', bgCard: '#0C1428', bgElevated: '#121D35', bgInput: '#182030',
-    blue: '#4F74FF', blueMid: 'rgba(79,116,255,0.2)', blueGlow: 'rgba(79,116,255,0.12)',
-    teal: '#14B8A6', tealGlow: 'rgba(20,184,166,0.12)',
-    purple: '#8B5CF6', purpleGlow: 'rgba(139,92,246,0.12)',
-    orange: '#F97316', orangeGlow: 'rgba(249,115,22,0.12)',
-    green: '#22C55E', greenSolid: '#16A34A', greenGlow: 'rgba(34,197,94,0.12)',
-    red: '#F87171', redSolid: '#DC2626', redGlow: 'rgba(248,113,113,0.12)',
-    amber: '#FCD34D', amberSolid: '#D97706', amberGlow: 'rgba(252,211,77,0.12)',
-    text: '#F0F6FF', textSub: '#7A90B8', textMuted: '#3A4A68',
-    border: 'rgba(79,116,255,0.1)', borderMid: 'rgba(79,116,255,0.18)',
+    bg: '#0A0814', bgCard: '#14101F', bgElevated: '#1C1530', bgInput: '#1A1428',
+    blue: '#8B6CFF', blueMid: 'rgba(139,108,255,0.22)', blueGlow: 'rgba(139,108,255,0.13)',
+    teal: '#2DD4BF', tealGlow: 'rgba(45,212,191,0.13)',
+    purple: '#A78BFA', purpleGlow: 'rgba(167,139,250,0.13)',
+    orange: '#FBBF24', orangeGlow: 'rgba(251,191,36,0.13)',
+    green: '#34D399', greenSolid: '#16A34A', greenGlow: 'rgba(52,211,153,0.13)',
+    red: '#FB7185', redSolid: '#E11D48', redGlow: 'rgba(251,113,133,0.13)',
+    amber: '#FCD34D', amberSolid: '#D97706', amberGlow: 'rgba(252,211,77,0.13)',
+    text: '#F5F2FF', textSub: '#9B8FC2', textMuted: '#4A4066',
+    border: 'rgba(139,108,255,0.12)', borderMid: 'rgba(139,108,255,0.22)',
+    accent: '#8B6CFF', accentSoft: '#FBBF24',
   },
   ocean: {
     name: 'Oceano', icon: 'droplet',
-    bg: '#010C1A', bgCard: '#061625', bgElevated: '#0B1F33', bgInput: '#0A1929',
-    blue: '#38BDF8', blueMid: 'rgba(56,189,248,0.2)', blueGlow: 'rgba(56,189,248,0.1)',
+    bg: '#05111C', bgCard: '#0B1E2E', bgElevated: '#102A3D', bgInput: '#0E2336',
+    blue: '#22D3EE', blueMid: 'rgba(34,211,238,0.2)', blueGlow: 'rgba(34,211,238,0.1)',
     teal: '#2DD4BF', tealGlow: 'rgba(45,212,191,0.1)',
-    purple: '#818CF8', purpleGlow: 'rgba(129,140,248,0.1)',
+    purple: '#67E8F9', purpleGlow: 'rgba(103,232,249,0.1)',
     orange: '#FB923C', orangeGlow: 'rgba(251,146,60,0.1)',
     green: '#34D399', greenSolid: '#059669', greenGlow: 'rgba(52,211,153,0.1)',
     red: '#FB7185', redSolid: '#E11D48', redGlow: 'rgba(251,113,133,0.1)',
     amber: '#FDE68A', amberSolid: '#D97706', amberGlow: 'rgba(253,230,138,0.1)',
-    text: '#E0F2FE', textSub: '#4B7BA6', textMuted: '#0C2340',
-    border: 'rgba(56,189,248,0.08)', borderMid: 'rgba(56,189,248,0.16)',
+    text: '#E5F8FC', textSub: '#5FA3BD', textMuted: '#123349',
+    border: 'rgba(34,211,238,0.1)', borderMid: 'rgba(34,211,238,0.18)',
+    accent: '#22D3EE', accentSoft: '#FB923C',
+  },
+  sunset: {
+    name: 'Pôr do Sol', icon: 'sunset',
+    bg: '#1A0F0A', bgCard: '#241510', bgElevated: '#301C13', bgInput: '#2A1810',
+    blue: '#FB7185', blueMid: 'rgba(251,113,133,0.2)', blueGlow: 'rgba(251,113,133,0.12)',
+    teal: '#FBBF24', tealGlow: 'rgba(251,191,36,0.12)',
+    purple: '#F472B6', purpleGlow: 'rgba(244,114,182,0.12)',
+    orange: '#FB923C', orangeGlow: 'rgba(251,146,60,0.13)',
+    green: '#A3E635', greenSolid: '#65A30D', greenGlow: 'rgba(163,230,53,0.12)',
+    red: '#F87171', redSolid: '#DC2626', redGlow: 'rgba(248,113,113,0.13)',
+    amber: '#FCD34D', amberSolid: '#D97706', amberGlow: 'rgba(252,211,77,0.13)',
+    text: '#FFF3EA', textSub: '#C7958A', textMuted: '#5C3F38',
+    border: 'rgba(251,146,60,0.14)', borderMid: 'rgba(251,146,60,0.22)',
+    accent: '#FB923C', accentSoft: '#FB7185',
   },
 };
 
@@ -1728,7 +1749,7 @@ const SuccessOverlay = ({ visible, onClose, T, fontScale }) => {
   );
 };
 
-const ProductDetailModalContent = ({ product, visible, onClose, onDelete, T, fontScale, fifoMode, allProducts }) => {
+const ProductDetailModalContent = ({ product, visible, onClose, onDelete, onUpdateQuantity, T, fontScale, fifoMode, allProducts }) => {
   const slideA = useRef(new Animated.Value(WIN.height)).current;
   const opacA = useRef(new Animated.Value(0)).current;
   const headerA = useRef(new Animated.Value(0)).current;
@@ -1740,6 +1761,9 @@ const ProductDetailModalContent = ({ product, visible, onClose, onDelete, T, fon
   const barA = useRef(new Animated.Value(0)).current;
   const soldBarA = useRef(new Animated.Value(0)).current;
   const glowA = useRef(new Animated.Value(0)).current;
+  const [addQtyValue, setAddQtyValue] = useState(1);
+
+  useEffect(() => { if (visible) setAddQtyValue(1); }, [visible, product?.id]);
 
   const GIRO = useMemo(() => makeGiro(T), [T]);
   const VENC = useMemo(() => makeVENC(T), [T]);
@@ -1969,6 +1993,42 @@ const ProductDetailModalContent = ({ product, visible, onClose, onDelete, T, fon
               </View>
             </Animated.View>
 
+            {/* ── Adicionar Quantidade — stepper + botão, posicionado ACIMA do "Apagar Produto" ── */}
+            <View style={{ backgroundColor: T.bgElevated, borderRadius: 22, padding: 18, borderWidth: 1, borderColor: T.border, marginBottom: 14 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: T.greenGlow, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: T.green + '40' }}><Feather name="plus-circle" size={16} color={T.green} /></View>
+                <Text style={{ fontSize: 11 * fontScale, fontWeight: '900', color: T.green, textTransform: 'uppercase', letterSpacing: 0.8 }}>Adicionar Quantidade</Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 14 }}>
+                <TouchableOpacity onPress={() => setAddQtyValue(v => Math.max(1, v - 1))} style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: T.bgInput, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: T.border }}>
+                  <Feather name="minus" size={19} color={T.text} />
+                </TouchableOpacity>
+                <TextInput
+                  value={String(addQtyValue)}
+                  onChangeText={txt => {
+                    const digits = txt.replace(/[^0-9]/g, '');
+                    if (digits === '') { setAddQtyValue(''); return; }
+                    setAddQtyValue(parseInt(digits, 10));
+                  }}
+                  onBlur={() => setAddQtyValue(v => (!v || v < 1) ? 1 : v)}
+                  keyboardType="number-pad"
+                  selectTextOnFocus
+                  style={{ fontSize: 26 * fontScale, fontWeight: '900', color: T.text, minWidth: 72, textAlign: 'center', backgroundColor: T.bgInput, borderRadius: 14, paddingVertical: 8, borderWidth: 1, borderColor: T.border }}
+                />
+                <TouchableOpacity onPress={() => setAddQtyValue(v => (parseInt(v, 10) || 0) + 1)} style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: T.bgInput, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: T.border }}>
+                  <Feather name="plus" size={19} color={T.text} />
+                </TouchableOpacity>
+              </View>
+              <PrimaryBtn
+                label={`Adicionar ${addQtyValue || 0} unidade${(addQtyValue || 0) !== 1 ? 's' : ''}`}
+                icon="check"
+                color={T.green}
+                fontScale={fontScale}
+                disabled={!addQtyValue || addQtyValue < 1}
+                onPress={() => { onUpdateQuantity?.(product, parseInt(addQtyValue, 10) || 0); setAddQtyValue(1); }}
+              />
+            </View>
+
             <TouchableOpacity onPress={() => { if (onDelete && product) { AppAlert.alert('Apagar Produto', `Deseja apagar "${product.produto || 'este produto'}" permanentemente da prateleira?`, [{ text: 'Cancelar', style: 'cancel' }, { text: 'Apagar', style: 'destructive', onPress: () => { onClose(); onDelete(product); } }]); } }} style={{ height: 52, borderRadius: 16, backgroundColor: T.redGlow, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', gap: 8, borderWidth: 1.5, borderColor: T.red + '50', marginBottom: 10 }}><Feather name="trash-2" size={18} color={T.red} /><Text style={{ fontSize: 14 * fontScale, fontWeight: '900', color: T.red }}>Apagar Produto</Text></TouchableOpacity>
             <TouchableOpacity onPress={onClose} style={{ height: 52, borderRadius: 16, backgroundColor: T.blue, justifyContent: 'center', alignItems: 'center', flexDirection: 'row', gap: 8, shadowColor: T.blue, shadowOpacity: 0.4, shadowRadius: 12, elevation: 6 }}><Feather name="check" size={18} color="#FFF" /><Text style={{ fontSize: 14 * fontScale, fontWeight: '900', color: '#FFF' }}>Fechar</Text></TouchableOpacity>
           </ScrollView>
@@ -1978,7 +2038,7 @@ const ProductDetailModalContent = ({ product, visible, onClose, onDelete, T, fon
   );
 };
 
-const ProductDetailModal = ({ product, visible, onClose, onDelete, T, fontScale, fifoMode, allProducts }) => {
+const ProductDetailModal = ({ product, visible, onClose, onDelete, onUpdateQuantity, T, fontScale, fifoMode, allProducts }) => {
   if (!product) return null;
   return (
     <ProductDetailModalContent
@@ -1986,6 +2046,7 @@ const ProductDetailModal = ({ product, visible, onClose, onDelete, T, fontScale,
       visible={visible}
       onClose={onClose}
       onDelete={onDelete}
+      onUpdateQuantity={onUpdateQuantity}
       T={T}
       fontScale={fontScale}
       fifoMode={fifoMode}
@@ -1995,7 +2056,21 @@ const ProductDetailModal = ({ product, visible, onClose, onDelete, T, fontScale,
 };
 
 const PrimaryBtn = ({ label, icon, onPress, color, outline, style, fontScale = 1, disabled = false }) => (
-  <TouchableOpacity activeOpacity={disabled ? 1 : 0.85} onPress={onPress} disabled={disabled} style={[styles.btn, { backgroundColor: outline ? 'transparent' : color, borderWidth: outline ? 1.5 : 0, borderColor: color, opacity: disabled ? 0.5 : 1 }, style]}>{icon && <Feather name={icon} size={18} color={outline ? color : '#FFF'} style={{ marginRight: 10 }} />}<Text style={[styles.btnTxt, { color: outline ? color : '#FFF', fontSize: 15 * fontScale }]}>{label}</Text></TouchableOpacity>
+  <TouchableOpacity activeOpacity={disabled ? 1 : 0.82} onPress={onPress} disabled={disabled} style={[styles.btn, {
+    backgroundColor: outline ? 'transparent' : color,
+    borderWidth: outline ? 1.5 : 0,
+    borderColor: color,
+    opacity: disabled ? 0.5 : 1,
+    borderRadius: 18,
+    shadowColor: outline ? 'transparent' : color,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: outline ? 0 : 0.28,
+    shadowRadius: 14,
+    elevation: outline ? 0 : 6,
+  }, style]}>
+    {icon && <Feather name={icon} size={18} color={outline ? color : '#FFF'} style={{ marginRight: 10 }} />}
+    <Text style={[styles.btnTxt, { color: outline ? color : '#FFF', fontSize: 15 * fontScale, letterSpacing: 0.2 }]}>{label}</Text>
+  </TouchableOpacity>
 );
 const ErrBanner = ({ msg, onClose }) => { if (!msg) return null; return (<View style={{ backgroundColor: '#DC2626', padding: 14, borderRadius: 14, marginHorizontal: 20, marginBottom: 12, flexDirection: 'row', alignItems: 'center', gap: 10, elevation: 4 }}><Feather name="alert-circle" size={18} color="#FFF" /><Text style={{ color: '#FFF', fontWeight: '700', flex: 1, fontSize: 13 }}>{msg}</Text><TouchableOpacity onPress={onClose}><Feather name="x" size={18} color="#FFF" /></TouchableOpacity></View>); };
 const ShelfQuickSelector = ({ current, onOpen, T, fontScale, title, subtitle }) => {
@@ -2032,20 +2107,30 @@ const CardList = ({ item, T, fontScale, onPress, fifoMode, allProducts }) => {
   const po = () => Animated.parallel([Animated.spring(scale, { toValue: 1, tension: 200, friction: 12, useNativeDriver: false }), Animated.timing(glow, { toValue: 0, duration: 200, useNativeDriver: false })]).start();
   return (
     <TouchableOpacity activeOpacity={0.98} onPress={() => onPress(item)} onPressIn={pi} onPressOut={po}>
-      <Animated.View style={{ backgroundColor: T.bgCard, borderRadius: 24, padding: 18, marginBottom: 14, borderWidth: 1.5, borderColor: glow.interpolate({ inputRange: [0, 1], outputRange: [T.border, g.color + '60'] }), transform: [{ scale }], shadowColor: g.color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: glow.interpolate({ inputRange: [0, 1], outputRange: [0.03, 0.15] }), shadowRadius: 12, elevation: 4 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-          <View style={{ flex: 1, marginRight: 8, flexDirection: 'row', alignItems: 'flex-start', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: vs.status === 'expired' ? T.red : vs.status === 'warning' ? T.amber : T.green, marginTop: 5, shadowColor: vs.status === 'expired' ? T.red : vs.status === 'warning' ? T.amber : T.green, shadowOpacity: 0.8, shadowRadius: 4, elevation: 3 }} /><Text style={{ fontWeight: '900', fontSize: 16 * fontScale, color: T.text, lineHeight: 22, flex: 1 }} numberOfLines={2}>{String(item.produto || '').trim() || 'Produto sem nome'}</Text></View>
-          <View style={{ backgroundColor: g.glow, borderWidth: 1, borderColor: g.color + '30', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, gap: 4 }}><Feather name={g.icon} size={10} color={g.color} /><Text style={{ fontSize: 10 * fontScale, fontWeight: '800', color: g.color }}>{g.short}</Text></View>
-        </View>
-        {(isNew || isRecent) && (<View style={{ flexDirection: 'row', marginBottom: 8 }}><View style={{ backgroundColor: isNew ? T.green + '20' : T.blue + '20', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: isNew ? T.green + '50' : T.blue + '50', flexDirection: 'row', alignItems: 'center', gap: 4 }}><Feather name={isNew ? "zap" : "clock"} size={10} color={isNew ? T.green : T.blue} /><Text style={{ fontSize: 9 * fontScale, fontWeight: '800', color: isNew ? T.green : T.blue }}>{isNew ? "NOVO" : "RECENTE"}</Text></View></View>)}
-        <View style={{ height: 6, backgroundColor: T.bgInput, borderRadius: 3, marginBottom: 12, overflow: 'hidden' }}><View style={{ height: '100%', width: `${metrics.remainingPct}%`, backgroundColor: metrics.remainingPct < 20 ? T.red : T.blue, borderRadius: 3 }} /></View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          <View style={{ flex: 1, minWidth: '45%', backgroundColor: T.bgElevated, borderRadius: 12, padding: 10, borderWidth: 1, borderColor: T.border }}><Text style={{ fontSize: 9 * fontScale, fontWeight: '800', color: T.textMuted, textTransform: 'uppercase', marginBottom: 2 }}>Estoque</Text><Text style={{ fontSize: 14 * fontScale, fontWeight: '900', color: T.blue }}>{metrics.remainingQty} <Text style={{ fontSize: 10, color: T.textSub }}>un</Text></Text></View>
-          <View style={{ flex: 1, minWidth: '45%', backgroundColor: T.purpleGlow, borderRadius: 12, padding: 10, borderWidth: 1, borderColor: T.purple + '20' }}><Text style={{ fontSize: 9 * fontScale, fontWeight: '800', color: T.purple, textTransform: 'uppercase', marginBottom: 2 }}>Ruptura</Text><Text style={{ fontSize: 14 * fontScale, fontWeight: '900', color: T.purple }}>{metrics.remainingDays}d</Text></View>
-        </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, paddingTop: 10, borderTopWidth: 1, borderColor: T.border }}>
-          {item.VENCIMENTO?.trim() ? (<View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><Feather name={vc.icon} size={12} color={vc.color} /><Text style={{ fontSize: 11 * fontScale, fontWeight: '800', color: vc.color }}>{vs.status === 'expired' ? `Vencido` : vs.status === 'warning' ? `${vs.days}d` : item.VENCIMENTO}</Text></View>) : <View />}
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><Feather name="user" size={10} color={T.textMuted} /><Text style={{ fontSize: 10 * fontScale, fontWeight: '700', color: T.textMuted }} numberOfLines={1}>{item.ENVIADOPORQUEM || 'Sistema'}</Text></View>
+      <Animated.View style={{ backgroundColor: T.bgCard, borderRadius: 22, marginBottom: 14, borderWidth: 1.5, borderColor: glow.interpolate({ inputRange: [0, 1], outputRange: [T.border, g.color + '60'] }), transform: [{ scale }], shadowColor: g.color, shadowOffset: { width: 0, height: 4 }, shadowOpacity: glow.interpolate({ inputRange: [0, 1], outputRange: [0.03, 0.15] }), shadowRadius: 12, elevation: 4, overflow: 'hidden', flexDirection: 'row' }}>
+        {/* ── Barra lateral de status (substitui o ponto colorido) ── */}
+        <View style={{ width: 5, backgroundColor: vs.status === 'expired' ? T.red : vs.status === 'warning' ? T.amber : T.green }} />
+        <View style={{ flex: 1, padding: 16 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+            <Text style={{ fontWeight: '900', fontSize: 16 * fontScale, color: T.text, lineHeight: 22, flex: 1, marginRight: 8 }} numberOfLines={2}>{String(item.produto || '').trim() || 'Produto sem nome'}</Text>
+            <View style={{ backgroundColor: g.glow, borderWidth: 1, borderColor: g.color + '30', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10, gap: 4 }}><Feather name={g.icon} size={10} color={g.color} /><Text style={{ fontSize: 10 * fontScale, fontWeight: '800', color: g.color }}>{g.short}</Text></View>
+          </View>
+          {(isNew || isRecent) && (<View style={{ flexDirection: 'row', marginBottom: 8 }}><View style={{ backgroundColor: isNew ? T.green + '20' : T.blue + '20', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, borderWidth: 1, borderColor: isNew ? T.green + '50' : T.blue + '50', flexDirection: 'row', alignItems: 'center', gap: 4 }}><Feather name={isNew ? "zap" : "clock"} size={10} color={isNew ? T.green : T.blue} /><Text style={{ fontSize: 9 * fontScale, fontWeight: '800', color: isNew ? T.green : T.blue }}>{isNew ? "NOVO" : "RECENTE"}</Text></View></View>)}
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10 }}>
+            <View style={{ flex: 1, backgroundColor: T.bgElevated, borderRadius: 13, padding: 10 }}>
+              <Text style={{ fontSize: 9 * fontScale, fontWeight: '800', color: T.textMuted, textTransform: 'uppercase', marginBottom: 3 }}>Estoque</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 3 }}><Text style={{ fontSize: 15 * fontScale, fontWeight: '900', color: T.blue }}>{metrics.remainingQty}</Text><Text style={{ fontSize: 10, color: T.textSub, fontWeight: '700' }}>un</Text></View>
+              <View style={{ height: 4, backgroundColor: T.bgInput, borderRadius: 2, marginTop: 6, overflow: 'hidden' }}><View style={{ height: '100%', width: `${metrics.remainingPct}%`, backgroundColor: metrics.remainingPct < 20 ? T.red : T.blue, borderRadius: 2 }} /></View>
+            </View>
+            <View style={{ flex: 1, backgroundColor: T.purpleGlow, borderRadius: 13, padding: 10 }}>
+              <Text style={{ fontSize: 9 * fontScale, fontWeight: '800', color: T.purple, textTransform: 'uppercase', marginBottom: 3 }}>Ruptura</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 3 }}><Text style={{ fontSize: 15 * fontScale, fontWeight: '900', color: T.purple }}>{metrics.remainingDays}</Text><Text style={{ fontSize: 10, color: T.purple, fontWeight: '700', opacity: 0.8 }}>dias</Text></View>
+            </View>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            {item.VENCIMENTO?.trim() ? (<View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><Feather name={vc.icon} size={12} color={vc.color} /><Text style={{ fontSize: 11.5 * fontScale, fontWeight: '800', color: vc.color }}>{vs.status === 'expired' ? `Vencido` : vs.status === 'warning' ? `${vs.days}d` : item.VENCIMENTO}</Text></View>) : <View />}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><Feather name="user" size={10} color={T.textMuted} /><Text style={{ fontSize: 10.5 * fontScale, fontWeight: '700', color: T.textMuted }} numberOfLines={1}>{item.ENVIADOPORQUEM || 'Sistema'}</Text></View>
+          </View>
         </View>
       </Animated.View>
     </TouchableOpacity>
@@ -2104,7 +2189,19 @@ const TabBtn = ({ icon, label, active, onPress, T, fontScale }) => {
   const scale = useRef(new Animated.Value(1)).current;
   const pi = () => { Animated.spring(scale, { toValue: 0.82, useNativeDriver: false }).start(); onPress?.(); };
   const po = () => Animated.spring(scale, { toValue: 1, tension: 250, friction: 10, useNativeDriver: false }).start();
-  return (<TouchableOpacity activeOpacity={1} onPressIn={pi} onPressOut={po} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 4 }}><Animated.View style={{ transform: [{ scale }], alignItems: 'center' }}><View style={[{ width: 44, height: 32, borderRadius: 12, justifyContent: 'center', alignItems: 'center' }, active && { backgroundColor: T.blueMid }]}><Feather name={icon} size={20} color={active ? T.blue : T.textMuted} /></View><Text style={{ fontSize: 10 * fontScale, fontWeight: active ? '900' : '700', color: active ? T.blue : T.textMuted, marginTop: 2 }}>{label}</Text></Animated.View></TouchableOpacity>);
+  return (
+    <TouchableOpacity activeOpacity={1} onPressIn={pi} onPressOut={po} style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3 }}>
+      <Animated.View style={{ transform: [{ scale }], alignItems: 'center' }}>
+        <View style={[
+          { width: active ? 50 : 40, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center' },
+          active && { backgroundColor: T.blue, shadowColor: T.blue, shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.4, shadowRadius: 8, elevation: 4 },
+        ]}>
+          <Feather name={icon} size={19} color={active ? '#FFF' : T.textMuted} />
+        </View>
+        <Text style={{ fontSize: 10 * fontScale, fontWeight: active ? '900' : '700', color: active ? T.blue : T.textMuted, marginTop: 3, letterSpacing: 0.1 }}>{label}</Text>
+      </Animated.View>
+    </TouchableOpacity>
+  );
 };
 
 const CalculatorModal = ({ visible, onClose, onResult, T, fontScale }) => {
@@ -2123,10 +2220,13 @@ const CalculatorModal = ({ visible, onClose, onResult, T, fontScale }) => {
       <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', padding: 16 }}>
         <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={onClose} />
         <View style={{ backgroundColor: T.bgCard, borderRadius: 32, padding: 20, borderWidth: 1, borderColor: T.border, shadowColor: '#000', shadowOpacity: 0.3, shadowRadius: 20, elevation: 15 }}>
-          <View style={{ backgroundColor: T.bgElevated, borderRadius: 20, padding: 16, marginBottom: 16, borderWidth: 1, borderColor: T.border }}><Text style={{ fontSize: 16 * fontScale, color: T.textMuted, textAlign: 'right', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', minHeight: 24 }}>{expression || '0'}</Text><Text style={{ fontSize: 32 * fontScale, fontWeight: '900', color: error ? T.red : T.text, textAlign: 'right', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', marginTop: 8 }}>{result || (lastResult !== null ? String(lastResult) : '0')}</Text></View>
-          {buttons.map((row, rowIdx) => (<View key={rowIdx} style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}>{row.map((btn) => { let bgColor = T.bgInput; let textColor = T.text; let isOperator = ['÷', '×', '-', '+', '='].includes(btn); if (btn === '=') { bgColor = T.green; textColor = '#FFF'; } else if (isOperator) { bgColor = T.blueMid; textColor = T.blue; } return (<TouchableOpacity key={btn} style={{ flex: 1, paddingVertical: 16, borderRadius: 18, backgroundColor: bgColor, alignItems: 'center', borderWidth: 1, borderColor: T.border }} onPress={() => { if (btn === '=') calculateResult(); else if (btn === 'C') clearAll(); else if (btn === '⌫') backspace(); else appendToExpression(btn); }}><Text style={{ fontSize: 24 * fontScale, fontWeight: '800', color: textColor }}>{btn}</Text></TouchableOpacity>); })}</View>))}
-          <View style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}><TouchableOpacity style={{ flex: 1, paddingVertical: 16, borderRadius: 18, backgroundColor: T.redGlow, alignItems: 'center', borderWidth: 1, borderColor: T.red + '50' }} onPress={clearAll}><Text style={{ fontSize: 20 * fontScale, fontWeight: '800', color: T.red }}>C</Text></TouchableOpacity><TouchableOpacity style={{ flex: 1, paddingVertical: 16, borderRadius: 18, backgroundColor: T.bgInput, alignItems: 'center', borderWidth: 1, borderColor: T.border }} onPress={backspace}><Feather name="delete" size={22} color={T.textSub} /></TouchableOpacity></View>
-          <View style={{ flexDirection: 'row', gap: 10 }}><TouchableOpacity style={{ flex: 1, paddingVertical: 14, borderRadius: 18, backgroundColor: T.bgInput, alignItems: 'center', borderWidth: 1, borderColor: T.border }} onPress={onClose}><Text style={{ fontSize: 16 * fontScale, fontWeight: '700', color: T.textSub }}>Cancelar</Text></TouchableOpacity><TouchableOpacity style={{ flex: 1, paddingVertical: 14, borderRadius: 18, backgroundColor: T.blue, alignItems: 'center', opacity: (result && !error && result !== 'Erro') ? 1 : 0.5 }} onPress={handleUseResult} disabled={!result || error || result === 'Erro'}><Text style={{ fontSize: 16 * fontScale, fontWeight: '900', color: '#FFF' }}>Usar Resultado</Text></TouchableOpacity></View>
+          <View style={{ backgroundColor: T.bgElevated, borderRadius: 24, padding: 20, marginBottom: 18 }}>
+            <Text style={{ fontSize: 15 * fontScale, color: T.textMuted, textAlign: 'right', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', minHeight: 22 }}>{expression || '0'}</Text>
+            <Text style={{ fontSize: 36 * fontScale, fontWeight: '900', color: error ? T.red : T.text, textAlign: 'right', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', marginTop: 6 }}>{result || (lastResult !== null ? String(lastResult) : '0')}</Text>
+          </View>
+          {buttons.map((row, rowIdx) => (<View key={rowIdx} style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}>{row.map((btn) => { let bgColor = T.bgInput; let textColor = T.text; let isOperator = ['÷', '×', '-', '+', '='].includes(btn); if (btn === '=') { bgColor = T.green; textColor = '#FFF'; } else if (isOperator) { bgColor = T.blueGlow; textColor = T.blue; } return (<TouchableOpacity key={btn} style={{ flex: 1, height: 58, borderRadius: 29, backgroundColor: bgColor, alignItems: 'center', justifyContent: 'center' }} onPress={() => { if (btn === '=') calculateResult(); else if (btn === 'C') clearAll(); else if (btn === '⌫') backspace(); else appendToExpression(btn); }}><Text style={{ fontSize: 22 * fontScale, fontWeight: '800', color: textColor }}>{btn}</Text></TouchableOpacity>); })}</View>))}
+          <View style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}><TouchableOpacity style={{ flex: 1, height: 52, borderRadius: 26, backgroundColor: T.redGlow, alignItems: 'center', justifyContent: 'center' }} onPress={clearAll}><Text style={{ fontSize: 18 * fontScale, fontWeight: '800', color: T.red }}>C</Text></TouchableOpacity><TouchableOpacity style={{ flex: 1, height: 52, borderRadius: 26, backgroundColor: T.bgInput, alignItems: 'center', justifyContent: 'center' }} onPress={backspace}><Feather name="delete" size={20} color={T.textSub} /></TouchableOpacity></View>
+          <View style={{ flexDirection: 'row', gap: 10 }}><TouchableOpacity style={{ flex: 1, paddingVertical: 14, borderRadius: 18, backgroundColor: T.bgInput, alignItems: 'center' }} onPress={onClose}><Text style={{ fontSize: 15 * fontScale, fontWeight: '700', color: T.textSub }}>Cancelar</Text></TouchableOpacity><PrimaryBtn label="Usar Resultado" icon="check" onPress={handleUseResult} color={T.blue} disabled={!result || error || result === 'Erro'} style={{ flex: 1.5 }} /></View>
         </View>
       </View>
     </Modal>
@@ -2153,7 +2253,8 @@ const ConfigScreen = ({ T, currentTheme, onThemeChange, fontScale, setFontScale,
   };
   return (
     <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: TAB_SAFE + 40 }} showsVerticalScrollIndicator={false}>
-      <Text style={{ fontSize: 26 * fontScale, fontWeight: '900', color: T.text, letterSpacing: -0.5, marginBottom: 24 }}>Configurações</Text>
+      <Text style={{ fontSize: 11 * fontScale, fontWeight: '800', color: T.blue, letterSpacing: 1.2, marginBottom: 4 }}>PERSONALIZAÇÃO</Text>
+      <Text style={{ fontSize: 27 * fontScale, fontWeight: '900', color: T.text, letterSpacing: -0.5, marginBottom: 24 }}>Configurações</Text>
       <View style={{ backgroundColor: T.bgCard, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: T.border, marginBottom: 16 }}>
         <Text style={{ fontSize: 14 * fontScale, fontWeight: '800', color: T.textSub, textTransform: 'uppercase', marginBottom: 16, letterSpacing: 0.8 }}>Segurança</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}><View style={{ flex: 1 }}><Text style={{ fontSize: 15 * fontScale, fontWeight: '700', color: T.text }}>Login com Biometria</Text><Text style={{ fontSize: 12 * fontScale, color: T.textSub, marginTop: 2 }}>Use FaceID/TouchID para acessar o app</Text></View><Switch value={biometricEnabled} onValueChange={onEnableBiometrics} trackColor={{ false: T.border, true: T.blue + '80' }} thumbColor={biometricEnabled ? T.blue : T.textMuted} /></View>
@@ -2165,8 +2266,27 @@ const ConfigScreen = ({ T, currentTheme, onThemeChange, fontScale, setFontScale,
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}><View style={{ flex: 1, paddingRight: 10 }}><Text style={{ fontSize: 15 * fontScale, fontWeight: '700', color: T.text }}>Modo FIFO</Text><Text style={{ fontSize: 12 * fontScale, color: T.textSub, marginTop: 2 }}>Agrupar lotes do mesmo produto e consumir o mais antigo primeiro.</Text></View><Switch value={fifoMode} onValueChange={setFifoMode} trackColor={{ false: T.border, true: T.blue + '80' }} thumbColor={fifoMode ? T.blue : T.textMuted} /></View>
       </View>
       <View style={{ backgroundColor: T.bgCard, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: T.border, marginBottom: 16 }}>
-        <Text style={{ fontSize: 14 * fontScale, fontWeight: '800', color: T.textSub, textTransform: 'uppercase', marginBottom: 16, letterSpacing: 0.8 }}>Aparência e Tema</Text>
-        <View style={{ flexDirection: 'row', gap: 10 }}>{Object.keys(THEMES).map(k => { const th = THEMES[k]; const on = currentTheme === k; return (<TouchableOpacity key={k} onPress={() => onThemeChange(k)} style={{ flex: 1, height: 80, borderRadius: 16, backgroundColor: on ? T.blueMid : T.bgInput, borderWidth: 2, borderColor: on ? T.blue : T.border, justifyContent: 'center', alignItems: 'center', gap: 6 }}><Feather name={th.icon} size={20} color={on ? T.blue : T.textSub} /><Text style={{ fontSize: 12 * fontScale, fontWeight: on ? '900' : '700', color: on ? T.blue : T.textSub }}>{th.name}</Text></TouchableOpacity>); })}</View>
+        <Text style={{ fontSize: 14 * fontScale, fontWeight: '800', color: T.textSub, textTransform: 'uppercase', marginBottom: 4, letterSpacing: 0.8 }}>Aparência e Tema</Text>
+        <Text style={{ fontSize: 12 * fontScale, color: T.textMuted, marginBottom: 16 }}>Escolha a identidade visual do app</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+          {Object.keys(THEMES).map(k => {
+            const th = THEMES[k]; const on = currentTheme === k;
+            return (
+              <TouchableOpacity key={k} onPress={() => onThemeChange(k)} style={{ width: '47%', borderRadius: 18, borderWidth: on ? 2 : 1, borderColor: on ? th.blue : T.border, overflow: 'hidden', backgroundColor: th.bg }}>
+                <View style={{ height: 50, flexDirection: 'row' }}>
+                  <View style={{ flex: 1, backgroundColor: th.bgCard }} />
+                  <View style={{ flex: 1, backgroundColor: th.blue }} />
+                  <View style={{ flex: 1, backgroundColor: th.accentSoft || th.amber }} />
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, padding: 10 }}>
+                  <Feather name={th.icon} size={13} color={on ? th.blue : th.textSub} />
+                  <Text style={{ fontSize: 12.5 * fontScale, fontWeight: on ? '900' : '700', color: th.text, flex: 1 }}>{th.name}</Text>
+                  {on && <Feather name="check-circle" size={14} color={th.blue} />}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
       <View style={{ backgroundColor: T.bgCard, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: T.border, marginBottom: 16 }}>
         <Text style={{ fontSize: 14 * fontScale, fontWeight: '800', color: T.textSub, textTransform: 'uppercase', marginBottom: 16, letterSpacing: 0.8 }}>Acessibilidade</Text>
@@ -2493,12 +2613,21 @@ const ChatScreen = ({ T, fontScale, msgs, chatTxt, setChatTxt, sendChat, sendCha
       )}
       <ScrollView ref={scrollRef} style={{ flex: 1, paddingHorizontal: 16 }} keyboardShouldPersistTaps="handled" keyboardDismissMode="interactive" contentContainerStyle={{ paddingTop: 16, paddingBottom: TAB_H + NAV_BAR_H + 20 }} showsVerticalScrollIndicator={false}>
         {msgs.length === 0 && (
-          <View style={{ alignItems: 'center', paddingTop: 40, paddingBottom: 20 }}>
-            <View style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: T.tealGlow, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: T.teal + '40', marginBottom: 16 }}>
-              <MaterialCommunityIcons name="robot-outline" size={32} color={T.teal} />
+          <View style={{ alignItems: 'center', paddingTop: 36, paddingBottom: 20 }}>
+            <View style={{ width: 76, height: 76, borderRadius: 26, backgroundColor: T.tealGlow, justifyContent: 'center', alignItems: 'center', marginBottom: 18 }}>
+              <View style={{ width: 56, height: 56, borderRadius: 18, backgroundColor: T.teal, justifyContent: 'center', alignItems: 'center' }}>
+                <MaterialCommunityIcons name="robot-outline" size={28} color="#FFF" />
+              </View>
             </View>
-            <Text style={{ fontSize: 18 * fontScale, fontWeight: '900', color: T.text, marginBottom: 6 }}>GEI Assistant</Text>
-            <Text style={{ fontSize: 13 * fontScale, color: T.textSub, textAlign: 'center', lineHeight: 20, paddingHorizontal: 30 }}>Pergunte ou fale naturalmente. Posso cadastrar produtos, analisar estoque e muito mais.</Text>
+            <Text style={{ fontSize: 19 * fontScale, fontWeight: '900', color: T.text, marginBottom: 6 }}>GEI Assistant</Text>
+            <Text style={{ fontSize: 13 * fontScale, color: T.textSub, textAlign: 'center', lineHeight: 20, paddingHorizontal: 30, marginBottom: 18 }}>Pergunte ou fale naturalmente. Posso cadastrar produtos, analisar estoque e muito mais.</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', paddingHorizontal: 16 }}>
+              {['Produtos vencendo essa semana', 'Cadastrar um produto'].map((s, i) => (
+                <TouchableOpacity key={i} onPress={() => setChatTxt(s)} style={{ paddingHorizontal: 14, paddingVertical: 9, borderRadius: 18, backgroundColor: T.bgCard, borderWidth: 1, borderColor: T.border }}>
+                  <Text style={{ fontSize: 12 * fontScale, fontWeight: '700', color: T.textSub }}>{s}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         )}
         {msgs.map((m) => (
@@ -2637,15 +2766,14 @@ const ChatScreen = ({ T, fontScale, msgs, chatTxt, setChatTxt, sendChat, sendCha
         )}
       </ScrollView>
 
-      {/* Barra de input */}
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: 12, paddingTop: 10, paddingBottom: 14, gap: 8, borderTopWidth: 1, borderColor: T.border, backgroundColor: T.bgCard }}>
-        {/* Botão mic para abrir modo voz */}
-        <TouchableOpacity onPress={() => setVoiceMode(true)} style={{ width: 48, height: 48, borderRadius: 15, backgroundColor: T.tealGlow, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: T.teal + '50' }}>
-          <Feather name="mic" size={20} color={T.teal} />
+      {/* Barra de input — redesenhada com cantos mais suaves e contraste de foco */}
+      <View style={{ flexDirection: 'row', alignItems: 'flex-end', paddingHorizontal: 14, paddingTop: 10, paddingBottom: 14, gap: 8, backgroundColor: T.bgCard, borderTopLeftRadius: 22, borderTopRightRadius: 22, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.04, shadowRadius: 8, elevation: 4 }}>
+        <TouchableOpacity onPress={() => setVoiceMode(true)} style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: T.tealGlow, justifyContent: 'center', alignItems: 'center' }}>
+          <Feather name="mic" size={19} color={T.teal} />
         </TouchableOpacity>
         <TextInput
           ref={inputRef}
-          style={{ flex: 1, backgroundColor: T.bgInput, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 13, color: T.text, fontSize: 15 * fontScale, maxHeight: 120, borderWidth: 1.5, borderColor: T.border, lineHeight: 20 }}
+          style={{ flex: 1, backgroundColor: T.bgInput, borderRadius: 23, paddingHorizontal: 18, paddingVertical: 13, color: T.text, fontSize: 15 * fontScale, maxHeight: 120, lineHeight: 20 }}
           placeholder="Pergunte ou peça para cadastrar..."
           placeholderTextColor={T.textSub}
           value={chatTxt}
@@ -2656,8 +2784,8 @@ const ChatScreen = ({ T, fontScale, msgs, chatTxt, setChatTxt, sendChat, sendCha
           blurOnSubmit={false}
           editable={!busy}
         />
-        <TouchableOpacity onPress={handleSend} disabled={busy || !chatTxt.trim()} style={{ width: 48, height: 48, borderRadius: 15, backgroundColor: chatTxt.trim() && !busy ? T.blue : T.bgInput, justifyContent: 'center', alignItems: 'center', borderWidth: chatTxt.trim() && !busy ? 0 : 1.5, borderColor: T.border, shadowColor: T.blue, shadowOpacity: chatTxt.trim() && !busy ? 0.4 : 0, shadowRadius: 8, elevation: chatTxt.trim() && !busy ? 4 : 0 }}>
-          <Feather name="send" size={20} color={chatTxt.trim() && !busy ? '#FFF' : T.textSub} />
+        <TouchableOpacity onPress={handleSend} disabled={busy || !chatTxt.trim()} style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: chatTxt.trim() && !busy ? T.blue : T.bgInput, justifyContent: 'center', alignItems: 'center', shadowColor: T.blue, shadowOpacity: chatTxt.trim() && !busy ? 0.35 : 0, shadowRadius: 8, elevation: chatTxt.trim() && !busy ? 4 : 0 }}>
+          <Feather name="send" size={19} color={chatTxt.trim() && !busy ? '#FFF' : T.textSub} />
         </TouchableOpacity>
       </View>
     </Animated.View>
@@ -2680,14 +2808,35 @@ const CadastroScreen = ({ T, fontScale, perf, cadastroShelf, setCadastroShelf, a
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, backgroundColor: T.bg }}>
       <Animated.View style={{ flex: 1, transform: [{ translateX: shakeAnim }] }}>
         <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: TAB_SAFE + 24 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16, justifyContent: 'space-between' }}><Text style={{ fontSize: 28 * fontScale, fontWeight: '900', color: T.text, letterSpacing: -0.5 }}>Novo Produto</Text><TouchableOpacity onPress={() => setShowPreview(!showPreview)} style={{ padding: 8, backgroundColor: T.bgInput, borderRadius: 20 }}><Feather name={showPreview ? 'eye-off' : 'eye'} size={22} color={T.blue} /></TouchableOpacity></View>
-          <Text style={{ fontSize: 13 * fontScale, color: T.textSub, fontWeight: '600', marginBottom: 20 }}>Passo {wStep} de 2</Text>
-          {(isCoord(perf) || isDeposito(perf)) && (<View style={{ backgroundColor: T.bgCard, borderRadius: 20, padding: 16, marginBottom: 20, borderWidth: 1.5, borderColor: T.orange + '50' }}><Text style={{ fontSize: 12 * fontScale, fontWeight: '800', color: T.orange, textTransform: 'uppercase', marginBottom: 12 }}>Prateleira de Destino</Text><View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{SHELF_KEYS.map(k => { const on = (cadastroShelf || activeShelf) === k; const pal = shelfPalette(T, k); return (<TouchableOpacity key={k} style={[{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border }, on && { backgroundColor: pal.glow, borderColor: pal.accent + '70' }]} onPress={() => setCadastroShelf(k)}><Feather name={pal.icon} size={13} color={on ? pal.accent : T.textSub} /><Text style={[{ fontSize: 13 * fontScale, fontWeight: '700', color: T.textSub }, on && { color: pal.accent, fontWeight: '900' }]}>{shlabel(k)}</Text></TouchableOpacity>); })}</View></View>)}
-          <View style={{ flexDirection: 'row', gap: 6, marginBottom: 28 }}>{STEPS.map((s, i) => { const done = wStep > i + 1, active = wStep === i + 1; return (<View key={s} style={{ flex: 1, alignItems: 'center', gap: 4 }}><View style={{ height: 5, width: '100%', borderRadius: 3, backgroundColor: done || active ? T.blue : T.bgInput, opacity: done ? 0.5 : 1 }} /><Text style={{ fontSize: 9 * fontScale, fontWeight: active ? '900' : '700', color: active ? T.blue : T.textMuted }}>{s}</Text></View>); })}</View>
-          <Animated.View style={{ backgroundColor: T.bgCard, borderRadius: 28, padding: 24, borderWidth: 1.5, borderColor: T.border, shadowColor: T.textMuted, shadowOpacity: 0.06, shadowRadius: 16, elevation: 4, opacity: stepAnim }}>
-            {wStep === 1 && (<><View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20 }}><View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: T.blueGlow, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: T.blue + '50' }}><Feather name="tag" size={20} color={T.blue} /></View><View><Text style={{ fontSize: 11 * fontScale, fontWeight: '900', color: T.blue, textTransform: 'uppercase', letterSpacing: 0.8 }}>Passo 1 de 2</Text><Text style={{ fontSize: 18 * fontScale, fontWeight: '900', color: T.text }}>Nome do Produto</Text></View></View><Text style={{ fontSize: 13 * fontScale, color: T.textSub, fontWeight: '600', marginBottom: 16, lineHeight: 19 }}>Digite o nome do produto que será cadastrado na prateleira.</Text><TextInput ref={inputRef} style={{ backgroundColor: T.bgInput, borderWidth: 2, borderColor: T.border, padding: 18, borderRadius: 18, fontSize: 16 * fontScale, color: T.text, fontWeight: '700', minHeight: 80, textAlignVertical: 'top' }} placeholder="Ex: Leite Integral Parmalat 1L" placeholderTextColor={T.textSub} value={prodName} onChangeText={setProdName} multiline autoCorrect />{prodName.length > 0 && (<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10, padding: 12, backgroundColor: T.blueGlow, borderRadius: 12, borderWidth: 1, borderColor: T.blue + '30' }}><Feather name="check-circle" size={14} color={T.blue} /><Text style={{ fontSize: 12 * fontScale, color: T.blue, fontWeight: '700', flex: 1 }} numberOfLines={1}>{prodName}</Text></View>)}</>)}
-            {wStep === 2 && (<><View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 20 }}><View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: T.amberGlow, justifyContent: 'center', alignItems: 'center', borderWidth: 1.5, borderColor: T.amber + '50' }}><Feather name="calendar" size={20} color={T.amber} /></View><View><Text style={{ fontSize: 11 * fontScale, fontWeight: '900', color: T.amber, textTransform: 'uppercase', letterSpacing: 0.8 }}>Passo 2 de 2</Text><Text style={{ fontSize: 18 * fontScale, fontWeight: '900', color: T.text }}>Data de Validade</Text></View></View><Text style={{ fontSize: 13 * fontScale, color: T.textSub, fontWeight: '600', marginBottom: 16 }}>Informe a data de vencimento impressa na embalagem.</Text><TextInput ref={inputRef} style={{ backgroundColor: T.bgInput, borderWidth: 2, borderColor: T.border, padding: 20, borderRadius: 18, fontSize: 28 * fontScale, color: T.text, textAlign: 'center', letterSpacing: 4, fontWeight: '900' }} keyboardType="numeric" placeholder="DD/MM/AAAA" placeholderTextColor={T.textSub} value={validade} onChangeText={fmtDate} maxLength={10} autoFocus />{validade.length === 10 && (isValidDate(validade) ? (() => { const vs = vencStatus(validade); const colors = { expired: T.red, warning: T.amber, ok: T.green, unknown: T.textMuted }; const icons = { expired: 'alert-circle', warning: 'alert-triangle', ok: 'check-circle', unknown: 'clock' }; const labels = { expired: `Produto já vencido!`, warning: `Vence em ${vs.days} dia${vs.days !== 1 ? 's' : ''}`, ok: `Válido até ${validade}`, unknown: 'Data inválida' }; return (<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 12, backgroundColor: colors[vs.status] + '18', borderRadius: 12, borderWidth: 1, borderColor: colors[vs.status] + '40' }}><Feather name={icons[vs.status]} size={16} color={colors[vs.status]} /><Text style={{ fontSize: 13 * fontScale, color: colors[vs.status], fontWeight: '800' }}>{labels[vs.status]}</Text></View>); })() : (<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 12, backgroundColor: T.redGlow, borderRadius: 12, borderWidth: 1, borderColor: T.red + '40' }}><Feather name="alert-circle" size={16} color={T.red} /><Text style={{ fontSize: 13 * fontScale, color: T.red, fontWeight: '800' }}>Data inválida! Use o formato DD/MM/AAAA e uma data real.</Text></View>))}</>)}
-            <View style={{ flexDirection: 'row', gap: 12, marginTop: 24 }}>{wStep > 1 && (<TouchableOpacity style={{ width: 52, height: 52, borderRadius: 16, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border, justifyContent: 'center', alignItems: 'center' }} onPress={() => animateStep(() => setWStep(p => p - 1))}><Feather name="arrow-left" size={20} color={T.textSub} /></TouchableOpacity>)}<PrimaryBtn label={wStep < 2 ? 'Avançar →' : '✓ Finalizar Cadastro'} onPress={handleNext} style={{ flex: 1 }} color={T.blue} fontScale={fontScale} /></View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6, justifyContent: 'space-between' }}>
+            <View>
+              <Text style={{ fontSize: 11 * fontScale, fontWeight: '800', color: T.blue, letterSpacing: 1.2, marginBottom: 2 }}>CADASTRO RÁPIDO</Text>
+              <Text style={{ fontSize: 27 * fontScale, fontWeight: '900', color: T.text, letterSpacing: -0.5 }}>Novo Produto</Text>
+            </View>
+            <TouchableOpacity onPress={() => setShowPreview(!showPreview)} style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: showPreview ? T.blueGlow : T.bgInput, borderWidth: 1, borderColor: showPreview ? T.blue + '50' : T.border, justifyContent: 'center', alignItems: 'center' }}><Feather name={showPreview ? 'eye-off' : 'eye'} size={19} color={showPreview ? T.blue : T.textSub} /></TouchableOpacity>
+          </View>
+          {(isCoord(perf) || isDeposito(perf)) && (<View style={{ backgroundColor: T.bgCard, borderRadius: 20, padding: 16, marginTop: 18, marginBottom: 4, borderWidth: 1.5, borderColor: T.orange + '40' }}><Text style={{ fontSize: 12 * fontScale, fontWeight: '800', color: T.orange, textTransform: 'uppercase', marginBottom: 12 }}>Prateleira de Destino</Text><View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{SHELF_KEYS.map(k => { const on = (cadastroShelf || activeShelf) === k; const pal = shelfPalette(T, k); return (<TouchableOpacity key={k} style={[{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border }, on && { backgroundColor: pal.glow, borderColor: pal.accent + '70' }]} onPress={() => setCadastroShelf(k)}><Feather name={pal.icon} size={13} color={on ? pal.accent : T.textSub} /><Text style={[{ fontSize: 13 * fontScale, fontWeight: '700', color: T.textSub }, on && { color: pal.accent, fontWeight: '900' }]}>{shlabel(k)}</Text></TouchableOpacity>); })}</View></View>)}
+          {/* ── Stepper redesenhado: trilha conectada com nós numerados ── */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 26, marginBottom: 22, paddingHorizontal: 4 }}>
+            {STEPS.map((s, i) => {
+              const idx = i + 1; const done = wStep > idx; const active = wStep === idx;
+              return (
+                <React.Fragment key={s}>
+                  <View style={{ alignItems: 'center', gap: 6 }}>
+                    <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: done ? T.blue : active ? T.bgCard : T.bgInput, borderWidth: active ? 2 : 0, borderColor: T.blue, justifyContent: 'center', alignItems: 'center' }}>
+                      {done ? <Feather name="check" size={15} color="#FFF" /> : <Text style={{ fontSize: 13, fontWeight: '900', color: active ? T.blue : T.textMuted }}>{idx}</Text>}
+                    </View>
+                    <Text style={{ fontSize: 10 * fontScale, fontWeight: active ? '900' : '700', color: active ? T.blue : T.textMuted }}>{s}</Text>
+                  </View>
+                  {i < STEPS.length - 1 && <View style={{ flex: 1, height: 2, backgroundColor: wStep > idx ? T.blue : T.border, marginHorizontal: 6, marginBottom: 16, borderRadius: 1 }} />}
+                </React.Fragment>
+              );
+            })}
+          </View>
+          <Animated.View style={{ backgroundColor: T.bgCard, borderRadius: 26, padding: 22, borderWidth: 1, borderColor: T.border, shadowColor: T.accent, shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.06, shadowRadius: 20, elevation: 3, opacity: stepAnim }}>
+            {wStep === 1 && (<><View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 20 }}><View style={{ width: 50, height: 50, borderRadius: 17, backgroundColor: T.blueGlow, justifyContent: 'center', alignItems: 'center' }}><Feather name="tag" size={22} color={T.blue} /></View><View style={{ flex: 1 }}><Text style={{ fontSize: 18 * fontScale, fontWeight: '900', color: T.text }}>Qual é o produto?</Text><Text style={{ fontSize: 12.5 * fontScale, color: T.textSub, fontWeight: '600', marginTop: 2 }}>Digite o nome impresso na embalagem</Text></View></View><TextInput ref={inputRef} style={{ backgroundColor: T.bgInput, borderWidth: 2, borderColor: T.border, padding: 18, borderRadius: 18, fontSize: 16 * fontScale, color: T.text, fontWeight: '700', minHeight: 80, textAlignVertical: 'top' }} placeholder="Ex: Leite Integral Parmalat 1L" placeholderTextColor={T.textSub} value={prodName} onChangeText={setProdName} multiline autoCorrect />{prodName.length > 0 && (<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10, padding: 12, backgroundColor: T.blueGlow, borderRadius: 12, borderWidth: 1, borderColor: T.blue + '30' }}><Feather name="check-circle" size={14} color={T.blue} /><Text style={{ fontSize: 12 * fontScale, color: T.blue, fontWeight: '700', flex: 1 }} numberOfLines={1}>{prodName}</Text></View>)}</>)}
+            {wStep === 2 && (<><View style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 20 }}><View style={{ width: 50, height: 50, borderRadius: 17, backgroundColor: T.amberGlow, justifyContent: 'center', alignItems: 'center' }}><Feather name="calendar" size={22} color={T.amber} /></View><View style={{ flex: 1 }}><Text style={{ fontSize: 18 * fontScale, fontWeight: '900', color: T.text }}>Validade do produto</Text><Text style={{ fontSize: 12.5 * fontScale, color: T.textSub, fontWeight: '600', marginTop: 2 }}>Data de vencimento na embalagem</Text></View></View><TextInput ref={inputRef} style={{ backgroundColor: T.bgInput, borderWidth: 2, borderColor: T.border, padding: 20, borderRadius: 18, fontSize: 28 * fontScale, color: T.text, textAlign: 'center', letterSpacing: 4, fontWeight: '900' }} keyboardType="numeric" placeholder="DD/MM/AAAA" placeholderTextColor={T.textSub} value={validade} onChangeText={fmtDate} maxLength={10} autoFocus />{validade.length === 10 && (isValidDate(validade) ? (() => { const vs = vencStatus(validade); const colors = { expired: T.red, warning: T.amber, ok: T.green, unknown: T.textMuted }; const icons = { expired: 'alert-circle', warning: 'alert-triangle', ok: 'check-circle', unknown: 'clock' }; const labels = { expired: `Produto já vencido!`, warning: `Vence em ${vs.days} dia${vs.days !== 1 ? 's' : ''}`, ok: `Válido até ${validade}`, unknown: 'Data inválida' }; return (<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 12, backgroundColor: colors[vs.status] + '18', borderRadius: 12, borderWidth: 1, borderColor: colors[vs.status] + '40' }}><Feather name={icons[vs.status]} size={16} color={colors[vs.status]} /><Text style={{ fontSize: 13 * fontScale, color: colors[vs.status], fontWeight: '800' }}>{labels[vs.status]}</Text></View>); })() : (<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 12, padding: 12, backgroundColor: T.redGlow, borderRadius: 12, borderWidth: 1, borderColor: T.red + '40' }}><Feather name="alert-circle" size={16} color={T.red} /><Text style={{ fontSize: 13 * fontScale, color: T.red, fontWeight: '800' }}>Data inválida! Use o formato DD/MM/AAAA e uma data real.</Text></View>))}</>)}
+            <View style={{ flexDirection: 'row', gap: 12, marginTop: 26 }}>{wStep > 1 && (<TouchableOpacity style={{ width: 54, height: 54, borderRadius: 17, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border, justifyContent: 'center', alignItems: 'center' }} onPress={() => animateStep(() => setWStep(p => p - 1))}><Feather name="arrow-left" size={20} color={T.textSub} /></TouchableOpacity>)}<PrimaryBtn label={wStep < 2 ? 'Avançar' : 'Finalizar Cadastro'} icon={wStep < 2 ? 'arrow-right' : 'check'} onPress={handleNext} style={{ flex: 1, height: 54 }} color={T.blue} fontScale={fontScale} /></View>
           </Animated.View>
           {showPreview && (prodName || validade) && (<View style={{ marginTop: 20, backgroundColor: T.bgCard, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: T.border }}><Text style={{ fontSize: 10 * fontScale, fontWeight: '900', color: T.textMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 12 }}>Resumo do Cadastro</Text>{[{ label: 'Produto', val: prodName, icon: 'tag', c: T.blue }, { label: 'Validade', val: validade, icon: 'calendar', c: T.amber }, { label: 'Destino', val: shlabel(getTargetShelf?.() || cadastroShelf || activeShelf), icon: 'layers', c: T.orange }].filter(i => i.val).map(i => (<View key={i.label} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 7, borderTopWidth: 1, borderColor: T.border }}><Feather name={i.icon} size={13} color={i.c} /><Text style={{ fontSize: 11 * fontScale, fontWeight: '700', color: T.textMuted, width: 64 }}>{i.label}</Text><Text style={{ fontSize: 13 * fontScale, fontWeight: '800', color: T.text, flex: 1 }} numberOfLines={1}>{i.val}</Text></View>))}</View>)}
         </ScrollView>
@@ -4142,17 +4291,52 @@ const RegisterScreen = ({ T, fontScale, onBack, onRegisterSuccess, showErr }) =>
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, backgroundColor: T.bg }}>
-      <ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24 }}><TouchableOpacity onPress={onBack} style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: T.bgInput, justifyContent: 'center', alignItems: 'center', marginRight: 12 }}><Feather name="arrow-left" size={20} color={T.textSub} /></TouchableOpacity><Text style={{ fontSize: 26 * fontScale, fontWeight: '900', color: T.text }}>Cadastro</Text></View>
-        <View style={{ backgroundColor: T.bgCard, borderRadius: 24, padding: 20, borderWidth: 1, borderColor: T.border }}>
-          <TextInput style={{ backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: T.border, borderRadius: 14, padding: 14, marginBottom: 16, color: T.text, fontSize: 15 }} placeholder="Nome completo" placeholderTextColor={T.textMuted} value={nome} onChangeText={setNome} />
-          <TextInput style={{ backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: T.border, borderRadius: 14, padding: 14, marginBottom: 16, color: T.text, fontSize: 15 }} placeholder="E-mail" placeholderTextColor={T.textMuted} value={email} onChangeText={v => setEmail(v.toLowerCase())} autoCapitalize="none" keyboardType="email-address" />
-          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: T.border, borderRadius: 14, marginBottom: 16, paddingRight: 12 }}><TextInput style={{ flex: 1, padding: 14, color: T.text, fontSize: 15 }} placeholder="Senha" placeholderTextColor={T.textMuted} secureTextEntry={!showPass} value={senha} onChangeText={setSenha} /><TouchableOpacity onPress={() => setShowPass(!showPass)}><Feather name={showPass ? 'eye' : 'eye-off'} size={20} color={T.textSub} /></TouchableOpacity></View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: T.border, borderRadius: 14, marginBottom: 16, paddingRight: 12 }}><TextInput style={{ flex: 1, padding: 14, color: T.text, fontSize: 15 }} placeholder="Confirmar senha" placeholderTextColor={T.textMuted} secureTextEntry={!showPass} value={confirmSenha} onChangeText={setConfirmSenha} /><TouchableOpacity onPress={() => setShowPass(!showPass)}><Feather name={showPass ? 'eye' : 'eye-off'} size={20} color={T.textSub} /></TouchableOpacity></View>
-          <Text style={{ fontSize: 14, fontWeight: '800', color: T.textSub, marginBottom: 8 }}>Função</Text>
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>{ALL_ROLES.map(r => (<TouchableOpacity key={r} style={{ flex: 1, paddingVertical: 10, borderRadius: 12, backgroundColor: perfil === r ? T.blue : T.bgInput, borderWidth: 1, borderColor: perfil === r ? T.blue : T.border }} onPress={() => setPerfil(r)}><Text style={{ textAlign: 'center', fontWeight: '700', color: perfil === r ? '#FFF' : T.textSub }}>{roleLabel(r)}</Text></TouchableOpacity>))}</View>
-          {perfil === 'Repositor' && (<><Text style={{ fontSize: 14, fontWeight: '800', color: T.textSub, marginBottom: 8 }}>Prateleira</Text><View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{SHELF_KEYS.map(k => (<TouchableOpacity key={k} style={{ paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12, backgroundColor: area === k ? T.blueGlow : T.bgInput, borderWidth: 1, borderColor: area === k ? T.blue : T.border }} onPress={() => setArea(k)}><Text style={{ fontWeight: '700', color: area === k ? T.blue : T.textSub }}>{shlabel(k)}</Text></TouchableOpacity>))}</View></>)}
-          <PrimaryBtn label={loading ? 'Cadastrando...' : 'Cadastrar'} onPress={handleRegister} color={T.blue} style={{ marginTop: 24 }} disabled={loading} />
+      <ScrollView contentContainerStyle={{ padding: 22, paddingTop: 28, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 22 }}>
+          <TouchableOpacity onPress={onBack} style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: T.bgInput, justifyContent: 'center', alignItems: 'center', marginRight: 12 }}><Feather name="arrow-left" size={19} color={T.textSub} /></TouchableOpacity>
+          <View>
+            <Text style={{ fontSize: 11 * fontScale, fontWeight: '800', color: T.purple, letterSpacing: 1.2 }}>NOVO ACESSO</Text>
+            <Text style={{ fontSize: 24 * fontScale, fontWeight: '900', color: T.text }}>Criar Cadastro</Text>
+          </View>
+        </View>
+        <View style={{ backgroundColor: T.bgCard, borderRadius: 26, padding: 22, borderWidth: 1, borderColor: T.border }}>
+          <Text style={{ fontSize: 11 * fontScale, fontWeight: '800', color: T.textSub, letterSpacing: 0.6, marginBottom: 14 }}>DADOS PESSOAIS</Text>
+          <View style={{ gap: 12, marginBottom: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: T.border, borderRadius: 16, paddingLeft: 14 }}>
+              <Feather name="user" size={16} color={T.textMuted} />
+              <TextInput style={{ flex: 1, padding: 14, paddingLeft: 10, color: T.text, fontSize: 15 }} placeholder="Nome completo" placeholderTextColor={T.textMuted} value={nome} onChangeText={setNome} />
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: T.border, borderRadius: 16, paddingLeft: 14 }}>
+              <Feather name="mail" size={16} color={T.textMuted} />
+              <TextInput style={{ flex: 1, padding: 14, paddingLeft: 10, color: T.text, fontSize: 15 }} placeholder="E-mail" placeholderTextColor={T.textMuted} value={email} onChangeText={v => setEmail(v.toLowerCase())} autoCapitalize="none" keyboardType="email-address" />
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: T.border, borderRadius: 16, paddingLeft: 14, paddingRight: 12 }}>
+              <Feather name="lock" size={16} color={T.textMuted} />
+              <TextInput style={{ flex: 1, padding: 14, paddingLeft: 10, color: T.text, fontSize: 15 }} placeholder="Senha" placeholderTextColor={T.textMuted} secureTextEntry={!showPass} value={senha} onChangeText={setSenha} />
+              <TouchableOpacity onPress={() => setShowPass(!showPass)}><Feather name={showPass ? 'eye' : 'eye-off'} size={18} color={T.textSub} /></TouchableOpacity>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: T.border, borderRadius: 16, paddingLeft: 14, paddingRight: 12 }}>
+              <Feather name="check-square" size={16} color={T.textMuted} />
+              <TextInput style={{ flex: 1, padding: 14, paddingLeft: 10, color: T.text, fontSize: 15 }} placeholder="Confirmar senha" placeholderTextColor={T.textMuted} secureTextEntry={!showPass} value={confirmSenha} onChangeText={setConfirmSenha} />
+              <TouchableOpacity onPress={() => setShowPass(!showPass)}><Feather name={showPass ? 'eye' : 'eye-off'} size={18} color={T.textSub} /></TouchableOpacity>
+            </View>
+          </View>
+          <Text style={{ fontSize: 11 * fontScale, fontWeight: '800', color: T.textSub, letterSpacing: 0.6, marginTop: 14, marginBottom: 12 }}>FUNÇÃO NA EQUIPE</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {ALL_ROLES.map(r => { const on = perfil === r; return (
+              <TouchableOpacity key={r} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 14, backgroundColor: on ? T.blue : T.bgInput, borderWidth: 1, borderColor: on ? T.blue : T.border }} onPress={() => setPerfil(r)}>
+                {on && <Feather name="check" size={12} color="#FFF" />}
+                <Text style={{ fontWeight: '700', fontSize: 13 * fontScale, color: on ? '#FFF' : T.textSub }}>{roleLabel(r)}</Text>
+              </TouchableOpacity>
+            ); })}
+          </View>
+          {perfil === 'Repositor' && (
+            <>
+              <Text style={{ fontSize: 11 * fontScale, fontWeight: '800', color: T.textSub, letterSpacing: 0.6, marginTop: 18, marginBottom: 12 }}>PRATELEIRA DESIGNADA</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>{SHELF_KEYS.map(k => { const on = area === k; return (<TouchableOpacity key={k} style={{ paddingHorizontal: 16, paddingVertical: 10, borderRadius: 14, backgroundColor: on ? T.blueGlow : T.bgInput, borderWidth: 1.5, borderColor: on ? T.blue + '60' : T.border }} onPress={() => setArea(k)}><Text style={{ fontWeight: '700', fontSize: 13 * fontScale, color: on ? T.blue : T.textSub }}>{shlabel(k)}</Text></TouchableOpacity>); })}</View>
+            </>
+          )}
+          <PrimaryBtn label={loading ? 'Cadastrando...' : 'Criar Cadastro'} icon={loading ? undefined : 'user-check'} onPress={handleRegister} color={T.blue} style={{ marginTop: 26 }} disabled={loading} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -4194,22 +4378,46 @@ const AdminPanel = ({ T, fontScale, onBack }) => {
   const doDeleteAllProducts = async () => { setDeleteShelfModal(false); const tableId = SHELVES[selectedShelfForDelete]; if (!tableId) { showModal('error', 'Erro', 'Prateleira inválida.'); return; } setDeleting(true); try { let page = 1; let totalDeleted = 0; while (true) { const res = await secureAxiosInstance.get(`https://api.baserow.io/api/database/rows/table/${tableId}/?user_field_names=true&size=100&page=${page}`); const rows = res.data?.results || []; if (rows.length === 0) break; for (const row of rows) { await secureAxiosInstance.delete(`https://api.baserow.io/api/database/rows/table/${tableId}/${row.id}/`); totalDeleted++; } if (!res.data?.next) break; page++; } await addAuditLog('ADMIN_DELETE_ALL_PRODUCTS', `${totalDeleted} produtos da prateleira ${selectedShelfForDelete} foram apagados`); setSelectedShelfForDelete(''); showModal('success', 'Prateleira limpa!', `${totalDeleted} produto(s) da prateleira ${shlabel(selectedShelfForDelete || '')} foram removidos com sucesso.`); } catch (error) { showModal('error', 'Erro ao apagar', `Falha ao apagar produtos: ${error?.message || 'Erro desconhecido'}`); } finally { setDeleting(false); } };
   const handleAdminLogin = () => { if (adminPass.trim() === 'cordeiroadmin') { setLoginError(''); setAdminAuthenticated(true); } else { setLoginError('Senha incorreta. Tente novamente.'); } };
 
-  const renderUserItem = ({ item }) => (<View style={{ backgroundColor: T.bgCard, borderRadius: 20, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: T.border }}><View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}><View style={{ flex: 1, marginRight: 8 }}><Text style={{ fontSize: 16, fontWeight: '900', color: T.text }} numberOfLines={1}>{item.NOME}</Text><Text style={{ fontSize: 13, color: T.textSub }} numberOfLines={1}>{item.USUARIO}</Text></View><View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><Text style={{ fontSize: 12, fontWeight: '700', color: T.textSub }}>Acesso:</Text><Switch value={item.ACESSO} onValueChange={() => toggleAccess(item)} trackColor={{ false: T.border, true: T.green }} thumbColor={item.ACESSO ? T.green : T.textMuted} /><TouchableOpacity onPress={() => confirmDeleteUser(item)} style={{ padding: 8, backgroundColor: T.redGlow, borderRadius: 12 }}><Feather name="trash-2" size={18} color={T.red} /></TouchableOpacity></View></View><View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8, gap: 12, flexWrap: 'wrap' }}><Text style={{ fontSize: 12, fontWeight: '700', color: T.textSub }}>Função: {roleLabel(item.PERFIL)}</Text><Text style={{ fontSize: 12, fontWeight: '700', color: T.textSub }}>Área: {shlabel(item.AREA)}</Text></View>{item.PERFIL === 'Repositor' && (<View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 12 }}>{SHELF_KEYS.map(k => (<TouchableOpacity key={k} onPress={() => changeArea(item, k)} style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: item.AREA === k ? T.blueGlow : T.bgInput, borderWidth: 1, borderColor: item.AREA === k ? T.blue : T.border }}><Text style={{ fontSize: 10, fontWeight: '700', color: item.AREA === k ? T.blue : T.textSub }}>{shlabel(k)}</Text></TouchableOpacity>))}</View>)}{item.RASTREIO && (<Text style={{ fontSize: 11, color: T.textMuted, marginTop: 8 }}>Rastreio: {item.RASTREIO}</Text>)}{item.UTIMOLOGIN && (<Text style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>Último login: {item.UTIMOLOGIN}</Text>)}</View>);
+  const renderUserItem = ({ item }) => (
+    <View style={{ backgroundColor: T.bgCard, borderRadius: 22, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: T.border }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <View style={{ width: 44, height: 44, borderRadius: 14, backgroundColor: item.ACESSO ? T.greenGlow : T.bgInput, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontSize: 16, fontWeight: '900', color: item.ACESSO ? T.green : T.textMuted }}>{(item.NOME || '?').trim().charAt(0).toUpperCase()}</Text>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontSize: 15, fontWeight: '900', color: T.text }} numberOfLines={1}>{item.NOME}</Text>
+          <Text style={{ fontSize: 12.5, color: T.textSub }} numberOfLines={1}>{item.USUARIO}</Text>
+        </View>
+        <Switch value={item.ACESSO} onValueChange={() => toggleAccess(item)} trackColor={{ false: T.border, true: T.green }} thumbColor={item.ACESSO ? T.green : T.textMuted} />
+        <TouchableOpacity onPress={() => confirmDeleteUser(item)} style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: T.redGlow, justifyContent: 'center', alignItems: 'center' }}><Feather name="trash-2" size={16} color={T.red} /></TouchableOpacity>
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 12, gap: 8, flexWrap: 'wrap' }}>
+        <View style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, backgroundColor: T.bgInput }}><Text style={{ fontSize: 11, fontWeight: '800', color: T.textSub }}>{roleLabel(item.PERFIL)}</Text></View>
+        <View style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10, backgroundColor: T.bgInput }}><Text style={{ fontSize: 11, fontWeight: '800', color: T.textSub }}>{shlabel(item.AREA)}</Text></View>
+      </View>
+      {item.PERFIL === 'Repositor' && (<View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>{SHELF_KEYS.map(k => (<TouchableOpacity key={k} onPress={() => changeArea(item, k)} style={{ paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: item.AREA === k ? T.blueGlow : T.bgInput, borderWidth: 1, borderColor: item.AREA === k ? T.blue : T.border }}><Text style={{ fontSize: 10, fontWeight: '700', color: item.AREA === k ? T.blue : T.textSub }}>{shlabel(k)}</Text></TouchableOpacity>))}</View>)}
+      {item.RASTREIO && (<Text style={{ fontSize: 11, color: T.textMuted, marginTop: 8 }}>Rastreio: {item.RASTREIO}</Text>)}
+      {item.UTIMOLOGIN && (<Text style={{ fontSize: 11, color: T.textMuted, marginTop: 4 }}>Último login: {item.UTIMOLOGIN}</Text>)}
+    </View>
+  );
 
   if (!adminAuthenticated) {
     return (
       <View style={{ flex: 1, backgroundColor: T.bg, justifyContent: 'center', padding: 24 }}>
-        <View style={{ backgroundColor: T.bgCard, borderRadius: 28, padding: 28, borderWidth: 1.5, borderColor: T.border, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 20, elevation: 8 }}>
-          <View style={{ alignItems: 'center', marginBottom: 24 }}>
-            <View style={{ width: 64, height: 64, borderRadius: 20, backgroundColor: T.blueGlow, justifyContent: 'center', alignItems: 'center', marginBottom: 16, borderWidth: 1.5, borderColor: T.blue + '40' }}>
-              <Feather name="shield" size={30} color={T.blue} />
+        <View style={{ backgroundColor: T.bgCard, borderRadius: 28, padding: 28, borderWidth: 1, borderColor: T.border, shadowColor: T.orange, shadowOffset: { width: 0, height: 14 }, shadowOpacity: 0.1, shadowRadius: 26, elevation: 8 }}>
+          <View style={{ alignItems: 'center', marginBottom: 26 }}>
+            <View style={{ width: 76, height: 76, borderRadius: 26, backgroundColor: T.orangeGlow, justifyContent: 'center', alignItems: 'center', marginBottom: 18 }}>
+              <View style={{ width: 52, height: 52, borderRadius: 16, backgroundColor: T.orange, justifyContent: 'center', alignItems: 'center' }}>
+                <Feather name="shield" size={24} color="#FFF" />
+              </View>
             </View>
-            <Text style={{ fontSize: 22, fontWeight: '900', color: T.text, marginBottom: 6 }}>Admin GEI.AI</Text>
-            <Text style={{ fontSize: 13, color: T.textSub, textAlign: 'center' }}>Digite a senha de administrador para acessar o painel.</Text>
+            <Text style={{ fontSize: 21, fontWeight: '900', color: T.text, marginBottom: 6 }}>Admin GEI.AI</Text>
+            <Text style={{ fontSize: 13, color: T.textSub, textAlign: 'center', lineHeight: 19 }}>Digite a senha de administrador para acessar o painel.</Text>
           </View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: loginError ? T.red + '80' : T.border, borderRadius: 16, marginBottom: loginError ? 10 : 20, paddingRight: 14 }}>
-            <TextInput style={{ flex: 1, padding: 18, color: T.text, fontSize: 16, fontWeight: '700' }} placeholder="Senha de administrador" placeholderTextColor={T.textSub} secureTextEntry={!showAdminPassword} value={adminPass} onChangeText={v => { setAdminPass(v); if (loginError) setLoginError(''); }} onSubmitEditing={handleAdminLogin} returnKeyType="done" />
-            <TouchableOpacity onPress={() => setShowAdminPassword(p => !p)} style={{ padding: 6 }}><Feather name={showAdminPassword ? 'eye' : 'eye-off'} size={20} color={T.textSub} /></TouchableOpacity>
+          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: loginError ? T.red + '80' : T.border, borderRadius: 16, marginBottom: loginError ? 10 : 20, paddingLeft: 14, paddingRight: 14 }}>
+            <Feather name="lock" size={17} color={T.textMuted} />
+            <TextInput style={{ flex: 1, padding: 16, paddingLeft: 10, color: T.text, fontSize: 16, fontWeight: '700' }} placeholder="Senha de administrador" placeholderTextColor={T.textSub} secureTextEntry={!showAdminPassword} value={adminPass} onChangeText={v => { setAdminPass(v); if (loginError) setLoginError(''); }} onSubmitEditing={handleAdminLogin} returnKeyType="done" />
+            <TouchableOpacity onPress={() => setShowAdminPassword(p => !p)}><Feather name={showAdminPassword ? 'eye' : 'eye-off'} size={19} color={T.textSub} /></TouchableOpacity>
           </View>
           {loginError ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 12, backgroundColor: T.redGlow, borderRadius: 14, marginBottom: 16, borderWidth: 1.5, borderColor: T.red + '50' }}>
@@ -4877,6 +5085,73 @@ const verificarTercaHoje = async (stockData) => {
   // Fala após 3s do boot para não sobrepor outras falas
   setTimeout(() => speakWithElevenLabs(msg, () => {}), 3000);
   return true;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ALERTA DE RUPTURA POR VELOCIDADE DE CONSUMO — notificação proativa
+// Calcula, para cada produto, quantos dias restam até o estoque zerar (usando
+// o mesmo motor de previsão do Painel Inteligente: buildDepletionMetrics) e
+// dispara uma notificação push automática quando há itens em risco crítico
+// (≤15% do estoque restante, mesmo critério usado na aba "Ruptura" do app).
+// Roda no máximo 1x por dia POR PRATELEIRA, para não espamar o usuário a cada
+// ciclo do polling de 8s — usa SafeStore para lembrar a última data avisada.
+// ─────────────────────────────────────────────────────────────────────────────
+const RUPTURA_CHANNEL_ID = 'risco_ruptura';
+const initRupturaChannel = async () => {
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync(RUPTURA_CHANNEL_ID, {
+      name: '📉 Risco de Ruptura de Estoque',
+      importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 150, 250],
+      sound: true,
+    });
+  }
+};
+const buildRupturaMsg = (stockData, fifoMode, shelfLabel) => {
+  if (!stockData || stockData.length === 0) return null;
+  const riscos = stockData
+    .map(p => ({ p, m: buildDepletionMetrics(p, fifoMode, stockData, p.codig) }))
+    .filter(({ m }) => m && m.remainingPct <= 15 && m.remainingQty > 0)
+    .sort((a, b) => a.m.remainingDays - b.m.remainingDays);
+  if (riscos.length === 0) return null;
+  const nomes = riscos.slice(0, 4).map(({ p, m }) => {
+    const nome = String(p.produto || p.nome || 'Produto').split('·')[0].trim();
+    return `${nome} (${m.remainingQty}un, ~${m.remainingDays}d)`;
+  });
+  const resto = riscos.length > 4 ? ` e mais ${riscos.length - 4} produto${riscos.length - 4 !== 1 ? 's' : ''}` : '';
+  return {
+    count: riscos.length,
+    body: `${shelfLabel}: ${nomes.join(', ')}${resto} podem faltar em breve. Hora de repor!`,
+  };
+};
+const verificarRupturaHoje = async (stockData, fifoMode, shelf, shelfLabel) => {
+  if (Platform.OS === 'web' || !shelf) return false;
+  try {
+    const KEY = `GEI_RupturaAvisadaHoje_${shelf}`;
+    const ultimaData = await SafeStore.getItemAsync(KEY);
+    const hoje_str = new Date().toLocaleDateString('pt-BR');
+    if (ultimaData === hoje_str) return false; // já avisou esta prateleira hoje
+    const info = buildRupturaMsg(stockData, fifoMode, shelfLabel);
+    if (!info) return false;
+    const granted = await requestNotifPermission();
+    if (!granted) return false;
+    await initRupturaChannel();
+    await SafeStore.setItemAsync(KEY, hoje_str);
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: '📉 GEI.AI — Risco de Ruptura de Estoque',
+        body: info.body,
+        sound: true,
+        priority: Notifications.AndroidNotificationPriority.HIGH,
+        data: { tipo: 'risco_ruptura', shelf, count: info.count },
+      },
+      trigger: Platform.OS === 'android' ? { channelId: RUPTURA_CHANNEL_ID } : null,
+    });
+    return true;
+  } catch (e) {
+    console.warn('[RUPTURA] Falha ao verificar/avisar:', e?.message);
+    return false;
+  }
 };
 
 // ── Utilidades de notificação de vencimento ──────────────────────────────────
@@ -5999,6 +6274,10 @@ const JARVIS_WAKE_WORDS = [
   'gei javis','gei jarvis','javis','jarvis',
   'abrir assistente','abre assistente','abrir o assistente','ativar assistente','chamar assistente',
   'oi gei','ola gei','ei gei','hey gei','gei assistente',
+  // ── "Ok GEI" — palavra de ativação no estilo "Ok Google" / "Hey Siri" ──────
+  // Inclui variações fonéticas comuns de como o reconhecimento de voz em
+  // PT-BR pode transcrever "ok gei" (okay/oquei/ok + gei/jay/jei).
+  'ok gei','oka gei','okay gei','oquei gei','oque gei','okei gei','ok je','ok jay','ok jei',
   'assistente inteligente','abrir o painel inteligente','abrir painel inteligente','abre painel inteligente',
   'painel inteligente','inteligente',
   'robo','abrir robo','abre robo','ativar robo','chamar robo',
@@ -8984,12 +9263,12 @@ const PainelInteligenteScreen = ({ visible, onClose, stockData, fifoMode, T, fon
 
           {/* Header */}
           <View style={{flexDirection:'row',alignItems:'center',paddingHorizontal:22,paddingVertical:10,gap:12}}>
-            <View style={{width:50,height:50,borderRadius:17,backgroundColor:T.tealGlow,justifyContent:'center',alignItems:'center',borderWidth:2,borderColor:T.teal+'60',shadowColor:T.teal,shadowOpacity:0.5,shadowRadius:12,elevation:8}}>
-              <MaterialCommunityIcons name="brain" size={26} color={T.teal} />
+            <View style={{width:50,height:50,borderRadius:17,backgroundColor:T.teal,justifyContent:'center',alignItems:'center'}}>
+              <MaterialCommunityIcons name="brain" size={24} color="#FFF" />
             </View>
             <View style={{flex:1}}>
               <View style={{flexDirection:'row',alignItems:'center',gap:5}}>
-                <View style={{width:6,height:6,borderRadius:3,backgroundColor:T.teal,shadowColor:T.teal,shadowOpacity:1,shadowRadius:4}} />
+                <View style={{width:6,height:6,borderRadius:3,backgroundColor:T.teal}} />
                 <Text style={{fontSize:8*fontScale,fontWeight:'900',color:T.teal,textTransform:'uppercase',letterSpacing:1.5}}>GEI.AI · CENTRAL DE INTELIGÊNCIA</Text>
               </View>
               <Text style={{fontSize:17*fontScale,fontWeight:'900',color:T.text,letterSpacing:-0.3}}>Painel Inteligente</Text>
@@ -8997,21 +9276,21 @@ const PainelInteligenteScreen = ({ visible, onClose, stockData, fifoMode, T, fon
                 {stockData?.length||0} produtos · {criticos.length} críticos · {fifoInfo.groups.length} grupos FIFO
               </Text>
             </View>
-            <TouchableOpacity onPress={onClose} style={{width:36,height:36,borderRadius:12,backgroundColor:T.bgInput,justifyContent:'center',alignItems:'center',borderWidth:1.5,borderColor:T.border}}>
+            <TouchableOpacity onPress={onClose} style={{width:36,height:36,borderRadius:14,backgroundColor:T.bgInput,justifyContent:'center',alignItems:'center'}}>
               <Feather name="x" size={16} color={T.textSub} />
             </TouchableOpacity>
           </View>
 
-          {/* Tab pills */}
+          {/* Tab pills — redesenhado: pill cheio quando ativo */}
           <View style={{flexDirection:'row',paddingHorizontal:16,gap:8,marginBottom:14}}>
             {TABS.map(tab => {
               const on = activeTab === tab.key;
               const badge = tab.key==='critico' ? criticos.length : tab.key==='ruptura' ? rupturaRisco.length : tab.key==='pedido' ? sugestoes.length : tab.key==='fifo' ? fifoInfo.groups.length : 0;
               return (
-                <TouchableOpacity key={tab.key} onPress={()=>setActiveTab(tab.key)} style={[{flex:1,flexDirection:'row',alignItems:'center',justifyContent:'center',paddingVertical:8,borderRadius:12,borderWidth:1.5,gap:4,backgroundColor:T.bgInput,borderColor:T.border},on&&{backgroundColor:T.tealGlow,borderColor:T.teal+'60'}]}>
-                  <Feather name={tab.icon} size={12} color={on?T.teal:T.textSub} />
-                  <Text style={{fontSize:10*fontScale,fontWeight:'800',color:on?T.teal:T.textSub}}>{tab.label}</Text>
-                  {badge>0 && <View style={{width:16,height:16,borderRadius:8,backgroundColor:on?T.teal:T.textMuted,justifyContent:'center',alignItems:'center'}}><Text style={{fontSize:9,fontWeight:'900',color:'#FFF'}}>{badge}</Text></View>}
+                <TouchableOpacity key={tab.key} onPress={()=>setActiveTab(tab.key)} style={[{flex:1,flexDirection:'row',alignItems:'center',justifyContent:'center',paddingVertical:9,borderRadius:14,gap:4,backgroundColor:T.bgInput},on&&{backgroundColor:T.teal}]}>
+                  <Feather name={tab.icon} size={12} color={on?'#FFF':T.textSub} />
+                  <Text style={{fontSize:10*fontScale,fontWeight:'800',color:on?'#FFF':T.textSub}}>{tab.label}</Text>
+                  {badge>0 && <View style={{minWidth:16,height:16,paddingHorizontal:3,borderRadius:8,backgroundColor:on?'rgba(255,255,255,0.3)':T.textMuted,justifyContent:'center',alignItems:'center'}}><Text style={{fontSize:9,fontWeight:'900',color:'#FFF'}}>{badge}</Text></View>}
                 </TouchableOpacity>
               );
             })}
@@ -9112,8 +9391,12 @@ const PainelInteligenteScreen = ({ visible, onClose, stockData, fifoMode, T, fon
             {/* ── Tab Ruptura ── */}
             {activeTab==='ruptura' && (
               <View>
-                <View style={{backgroundColor:T.amberGlow,borderRadius:14,padding:12,borderWidth:1,borderColor:T.amber+'30',marginBottom:14}}>
+                <View style={{backgroundColor:T.amberGlow,borderRadius:14,padding:12,borderWidth:1,borderColor:T.amber+'30',marginBottom:10}}>
                   <Text style={{fontSize:11*fontScale,fontWeight:'800',color:T.amber}}>⚠️ Produtos com menos de 15% de estoque restante estimado (baseado no giro).</Text>
+                </View>
+                <View style={{flexDirection:'row',alignItems:'center',gap:7,marginBottom:14,paddingHorizontal:4}}>
+                  <View style={{width:7,height:7,borderRadius:4,backgroundColor:T.green}} />
+                  <Text style={{fontSize:10.5*fontScale,fontWeight:'700',color:T.textSub}}>Monitoramento automático ativo · você recebe um aviso por notificação se algum item entrar em risco</Text>
                 </View>
                 {rupturaRisco.length===0 ? (
                   <View style={{alignItems:'center',paddingVertical:40}}>
@@ -9304,6 +9587,570 @@ const JarvisCentralModal = ({
         </Animated.View>
       </Animated.View>
     </Modal>
+  );
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+//  SCANNER MODAL PREMIUM  ─  Substitui o <Modal visible={scanning}> antigo
+// ════════════════════════════════════════════════════════════════════════════
+const BARCODE_VW = 300;
+const BARCODE_VH = 170;
+const AI_VW = 270;
+const CORNER_SZ = 28;
+const CORNER_TH = 3.5;
+
+const ScanCorner = ({ position, color, glow }) => {
+  const pos = {};
+  if (position.includes('top'))    pos.top    = -2;
+  if (position.includes('bottom')) pos.bottom = -2;
+  if (position.includes('left'))   pos.left   = -2;
+  if (position.includes('right'))  pos.right  = -2;
+  const borders = {
+    topLeft:     { borderTopWidth: CORNER_TH, borderLeftWidth: CORNER_TH },
+    topRight:    { borderTopWidth: CORNER_TH, borderRightWidth: CORNER_TH },
+    bottomLeft:  { borderBottomWidth: CORNER_TH, borderLeftWidth: CORNER_TH },
+    bottomRight: { borderBottomWidth: CORNER_TH, borderRightWidth: CORNER_TH },
+  };
+  const cornerRadii = {
+    topLeft:     { borderTopLeftRadius: 14 },
+    topRight:    { borderTopRightRadius: 14 },
+    bottomLeft:  { borderBottomLeftRadius: 14 },
+    bottomRight: { borderBottomRightRadius: 14 },
+  };
+  const borderColor = glow.interpolate({ inputRange: [0,1], outputRange: [color+'AA', '#FFFFFF'] });
+  const shadowOpacity = glow.interpolate({ inputRange: [0,1], outputRange: [0.4, 0.95] });
+  return (
+    <Animated.View style={[{
+      position:'absolute', width:CORNER_SZ, height:CORNER_SZ, borderColor,
+      shadowColor: color, shadowOpacity, shadowRadius: 10, elevation: 8,
+    }, pos, borders[position], cornerRadii[position]]} />
+  );
+};
+
+const ScannerModalPremium = ({
+  visible, scanMode, camRef, torchOn, setTorchOn,
+  onBarcode, onClose, onAIVisionCameraReady,
+  showAchandoGif, T, isDarkEnv, fontScale, scanAnim, pulseAnim,
+}) => {
+  const enterAnim  = useRef(new Animated.Value(0)).current;
+  const glowAnim   = useRef(new Animated.Value(0)).current;
+  const ring1      = useRef(new Animated.Value(0.5)).current;
+  const ring2      = useRef(new Animated.Value(0.5)).current;
+  const ring3      = useRef(new Animated.Value(0.5)).current;
+  const iconRot    = useRef(new Animated.Value(0)).current;
+  const srcFade    = useRef(new Animated.Value(1)).current;
+  const textSlide  = useRef(new Animated.Value(18)).current;
+  const textOpac   = useRef(new Animated.Value(0)).current;
+  const torchScale = useRef(new Animated.Value(1)).current;
+  const orbitRot   = useRef(new Animated.Value(0)).current;
+
+  const [activeSrc, setActiveSrc] = React.useState(0);
+  const [dotIdx, setDotIdx] = React.useState(0);
+
+  const SOURCES = [
+    { label: 'GEI.IA',         icon: 'cpu',      color: '#7C3AED' },
+    { label: 'Bluesoft',       icon: 'database',  color: '#0EA5E9' },
+    { label: 'OpenFoodFacts',  icon: 'leaf',      color: '#16A34A' },
+  ];
+  const blue   = '#4F74FF';
+  const purple = '#8B5CF6';
+  const acColor = scanMode === 'barcode' ? blue : purple;
+  const { width: SW, height: SH } = Dimensions.get('window');
+
+  useEffect(() => {
+    if (!visible) { enterAnim.setValue(0); return; }
+    enterAnim.setValue(0);
+    Animated.timing(enterAnim, { toValue:1, duration:380, easing:Easing.out(Easing.cubic), useNativeDriver:true }).start();
+    const glowLoop = Animated.loop(Animated.sequence([
+      Animated.timing(glowAnim, { toValue:1, duration:900, useNativeDriver:false }),
+      Animated.timing(glowAnim, { toValue:0, duration:900, useNativeDriver:false }),
+    ]));
+    glowLoop.start();
+    return () => glowLoop.stop();
+  }, [visible, scanMode]);
+
+  useEffect(() => {
+    if (!showAchandoGif) return;
+    // Anéis pulsantes para overlay "Consultando"
+    const makeRingLoop = (anim, delay) => Animated.loop(Animated.sequence([
+      Animated.delay(delay),
+      Animated.timing(anim, { toValue:1.55, duration:1300, easing:Easing.out(Easing.cubic), useNativeDriver:true }),
+      Animated.timing(anim, { toValue:0.5, duration:0, useNativeDriver:true }),
+    ]));
+    const r1 = makeRingLoop(ring1, 0);
+    const r2 = makeRingLoop(ring2, 380);
+    const r3 = makeRingLoop(ring3, 760);
+    const rotLoop = Animated.loop(Animated.timing(iconRot, { toValue:1, duration:2000, easing:Easing.linear, useNativeDriver:true }));
+    r1.start(); r2.start(); r3.start(); rotLoop.start();
+    textSlide.setValue(18); textOpac.setValue(0);
+    Animated.parallel([
+      Animated.timing(textSlide, { toValue:0, duration:320, delay:120, easing:Easing.out(Easing.cubic), useNativeDriver:true }),
+      Animated.timing(textOpac,  { toValue:1, duration:280, delay:120, useNativeDriver:true }),
+    ]).start();
+    const dotInt = setInterval(() => setDotIdx(i => (i+1)%4), 380);
+    const srcInt = setInterval(() => {
+      Animated.timing(srcFade, { toValue:0, duration:180, useNativeDriver:true }).start(() => {
+        setActiveSrc(i => (i+1) % SOURCES.length);
+        Animated.timing(srcFade, { toValue:1, duration:220, useNativeDriver:true }).start();
+      });
+    }, 1100);
+    return () => { r1.stop(); r2.stop(); r3.stop(); rotLoop.stop(); clearInterval(dotInt); clearInterval(srcInt); };
+  }, [showAchandoGif]);
+
+  useEffect(() => {
+    if (!visible || scanMode !== 'aiVision') { orbitRot.setValue(0); return; }
+    const orbitLoop = Animated.loop(Animated.timing(orbitRot, { toValue: 1, duration: 6000, easing: Easing.linear, useNativeDriver: true }));
+    orbitLoop.start();
+    return () => orbitLoop.stop();
+  }, [visible, scanMode]);
+
+  const pressTorch = () => {
+    Animated.sequence([
+      Animated.timing(torchScale, { toValue:0.85, duration:80, useNativeDriver:true }),
+      Animated.spring(torchScale, { toValue:1, tension:200, friction:7, useNativeDriver:true }),
+    ]).start();
+    setTorchOn(v => !v);
+  };
+
+  const rotate = iconRot.interpolate({ inputRange:[0,1], outputRange:['0deg','360deg'] });
+  const orbitRotate = orbitRot.interpolate({ inputRange:[0,1], outputRange:['0deg','360deg'] });
+  const dots = '...'.slice(0, dotIdx);
+  const src = SOURCES[activeSrc];
+  const RINGSZ = 156;
+
+  const laserTop = scanAnim.interpolate({ inputRange:[0,1], outputRange:[6, BARCODE_VH - 6] });
+  const laserOp  = scanAnim.interpolate({ inputRange:[0,0.08,0.92,1], outputRange:[0,1,1,0] });
+  const aiScale  = pulseAnim.interpolate({ inputRange:[1,1.07], outputRange:[1,1.08] });
+
+  const sideW = (SW - (scanMode === 'barcode' ? BARCODE_VW : AI_VW)) / 2;
+  const viewH = scanMode === 'barcode' ? BARCODE_VH : AI_VW;
+  const topH  = (SH - viewH) / 2 - 20;
+
+  return (
+    <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onClose} statusBarTranslucent>
+      <View style={StyleSheet.absoluteFill}>
+        {/* ── Câmera ── */}
+        <CameraView
+          ref={camRef}
+          style={StyleSheet.absoluteFill}
+          enableTorch={torchOn}
+          onBarcodeScanned={scanMode === 'barcode' ? onBarcode : undefined}
+          barcodeScannerSettings={{ barcodeTypes: ['ean13','upc_a','ean8','qr','code128'] }}
+          onCameraReady={scanMode === 'aiVision' ? onAIVisionCameraReady : undefined}
+        />
+
+        {/* ── Vinheta ── */}
+        <View pointerEvents="none" style={StyleSheet.absoluteFillObject}>
+          <View style={{ height: topH, backgroundColor: 'rgba(0,0,0,0.56)' }} />
+          <View style={{ flexDirection:'row', height: viewH }}>
+            <View style={{ width: sideW, backgroundColor: 'rgba(0,0,0,0.56)' }} />
+            <View style={{ width: scanMode === 'barcode' ? BARCODE_VW : AI_VW }} />
+            <View style={{ flex:1, backgroundColor: 'rgba(0,0,0,0.56)' }} />
+          </View>
+          <View style={{ flex:1, backgroundColor: 'rgba(0,0,0,0.56)' }} />
+        </View>
+
+        {/* ── UI Principal ── */}
+        <Animated.View style={{ ...StyleSheet.absoluteFillObject, opacity: enterAnim, alignItems:'center', justifyContent:'center' }}>
+
+          {/* Viewfinder Barcode — redesenhado: grade sutil + laser com trilha em camadas */}
+          {scanMode === 'barcode' && (
+            <Animated.View style={{
+              width: BARCODE_VW, height: BARCODE_VH, position:'relative',
+              transform: [{ scale: glowAnim.interpolate({ inputRange:[0,1], outputRange:[1,1.008] }) }],
+            }}>
+              <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: blue+'08', borderRadius:18 }} />
+              {/* Grade sutil de alinhamento — 3 linhas verticais finas */}
+              <View pointerEvents="none" style={{ ...StyleSheet.absoluteFillObject, flexDirection:'row', justifyContent:'space-evenly', paddingHorizontal: BARCODE_VW * 0.18 }}>
+                {[0,1,2].map(i => <View key={i} style={{ width:1, backgroundColor: blue+'14' }} />)}
+              </View>
+              <Animated.View style={{
+                ...StyleSheet.absoluteFillObject, borderRadius:18, borderWidth:1.5,
+                borderColor: blue+'35',
+                shadowColor: blue,
+                shadowOpacity: glowAnim.interpolate({ inputRange:[0,1], outputRange:[0.3,0.75] }),
+                shadowRadius:26, elevation:12,
+              }} />
+              {['topLeft','topRight','bottomLeft','bottomRight'].map(p =>
+                <ScanCorner key={p} position={p} color={blue} glow={glowAnim} />
+              )}
+              {/* Laser redesenhado: núcleo brilhante + trilha de desfoque em 3 camadas + reflexo */}
+              <Animated.View pointerEvents="none" style={{
+                position:'absolute', left:6, right:6, top: laserTop, opacity: laserOp,
+              }}>
+                {/* Trilha de desfoque larga (camada mais externa, mais sutil) */}
+                <View style={{ position:'absolute', top:-14, left:0, right:0, height:30, backgroundColor: blue+'10', borderRadius:15 }} />
+                {/* Trilha intermediária */}
+                <View style={{ position:'absolute', top:-6, left:0, right:0, height:14, backgroundColor: blue+'28', borderRadius:7 }} />
+                {/* Núcleo do laser com gradiente simulado por camadas finas */}
+                <View style={{ height:3, backgroundColor:'#FFFFFF', borderRadius:2, shadowColor: blue, shadowOpacity:1, shadowRadius:12, elevation:14 }} />
+                <View style={{ position:'absolute', top:0.5, left:0, right:0, height:2, backgroundColor: blue, borderRadius:1.5, opacity:0.9 }} />
+              </Animated.View>
+            </Animated.View>
+          )}
+
+          {/* Viewfinder AI Vision — redesenhado: anéis com profundidade + partículas orbitando */}
+          {scanMode === 'aiVision' && (
+            <View style={{ width:AI_VW, height:AI_VW, alignItems:'center', justifyContent:'center' }}>
+              {/* Anéis externos com gradiente de opacidade suave */}
+              {[1.16, 1.0, 0.86].map((mult, idx) => (
+                <Animated.View key={idx} style={{
+                  position:'absolute',
+                  width: AI_VW * mult, height: AI_VW * mult,
+                  borderRadius: AI_VW * mult / 2,
+                  borderWidth: idx === 1 ? 2.5 : 1,
+                  borderColor: purple,
+                  borderStyle: idx === 0 ? 'dashed' : 'solid',
+                  opacity: idx === 1 ? glowAnim.interpolate({ inputRange:[0,1], outputRange:[0.6,1] }) : idx === 0 ? 0.18 : 0.3,
+                  transform: [{ scale: idx === 1 ? aiScale : 1 }, { rotate: idx === 0 ? orbitRotate : '0deg' }],
+                  shadowColor: purple,
+                  shadowOpacity: idx === 1 ? 0.55 : 0,
+                  shadowRadius: 26, elevation: idx === 1 ? 14 : 0,
+                }} />
+              ))}
+              {/* Partículas orbitando — substituem o crosshair estático */}
+              {[0,72,144,216,288].map((deg, i) => (
+                <Animated.View key={deg} style={{
+                  position:'absolute', width:5, height:5, borderRadius:2.5,
+                  backgroundColor: i % 2 === 0 ? purple : '#FFFFFF',
+                  opacity: 0.75,
+                  shadowColor: purple, shadowOpacity:0.9, shadowRadius:6, elevation:6,
+                  transform: [{ rotate: orbitRotate }, { translateX: AI_VW * 0.5 }, { rotate: `${deg}deg` }],
+                }} />
+              ))}
+              {/* Ícone central — anel duplo (halo suave + núcleo nítido) */}
+              <View style={{ width:108, height:108, borderRadius:54, backgroundColor: purple+'0C', alignItems:'center', justifyContent:'center' }}>
+                <Animated.View style={{
+                  width:84, height:84, borderRadius:42,
+                  backgroundColor: purple+'1C',
+                  borderWidth:2.5, borderColor:purple,
+                  alignItems:'center', justifyContent:'center',
+                  transform:[{ scale: aiScale }],
+                  shadowColor:purple, shadowOpacity:0.65, shadowRadius:30, elevation:16,
+                }}>
+                  <MaterialCommunityIcons name="robot-outline" size={40} color={purple} />
+                </Animated.View>
+              </View>
+            </View>
+          )}
+
+          {/* Label inferior — redesenhado com vidro consistente */}
+          <View style={{
+            position:'absolute', bottom:100, left:0, right:0, alignItems:'center', paddingHorizontal:32,
+          }}>
+            <View style={{
+              flexDirection:'row', alignItems:'center', gap:8,
+              paddingHorizontal:18, paddingVertical:10,
+              backgroundColor:'rgba(255,255,255,0.10)',
+              borderRadius:22, borderWidth:1,
+              borderColor:'rgba(255,255,255,0.18)',
+              marginBottom:10,
+            }}>
+              <View style={{ width:7, height:7, borderRadius:3.5, backgroundColor: acColor, shadowColor: acColor, shadowOpacity:0.8, shadowRadius:5 }} />
+              <Text style={{ color:'#FFF', fontSize:13*fontScale, fontWeight:'900', letterSpacing:0.3 }}>
+                {scanMode === 'barcode' ? 'Posicione o código de barras' : 'IA Vision · Gemini'}
+              </Text>
+            </View>
+            <Text style={{ color:'rgba(255,255,255,0.55)', fontSize:12*fontScale, fontWeight:'600', textAlign:'center' }}>
+              {scanMode === 'barcode' ? 'Nome preenchido automaticamente pela IA' : 'Aponte para qualquer embalagem do produto'}
+            </Text>
+          </View>
+
+          {/* Aviso ambiente escuro */}
+          {isDarkEnv && !torchOn && (
+            <View style={{
+              position:'absolute', bottom:165, left:24, right:24,
+              backgroundColor:'rgba(252,211,77,0.12)',
+              borderRadius:18, borderWidth:1.5, borderColor:'rgba(252,211,77,0.45)',
+              paddingHorizontal:14, paddingVertical:10,
+              flexDirection:'row', alignItems:'center', gap:9,
+            }}>
+              <Feather name="sun" size={15} color="#FCD34D" />
+              <Text style={{ color:'#FCD34D', fontSize:12*fontScale, fontWeight:'700', flex:1 }}>
+                Ambiente escuro — ative o flash para melhor leitura
+              </Text>
+            </View>
+          )}
+        </Animated.View>
+
+        {/* ── Header: botões — redesenhado com vidro mais translúcido ── */}
+        <Animated.View style={{
+          position:'absolute', top:48, left:0, right:0,
+          paddingHorizontal:20, flexDirection:'row',
+          alignItems:'center', justifyContent:'space-between',
+          opacity: enterAnim,
+        }}>
+          {/* Fechar */}
+          <TouchableOpacity onPress={onClose} activeOpacity={0.8} style={{
+            width:46, height:46, borderRadius:18,
+            backgroundColor:'rgba(255,255,255,0.10)',
+            borderWidth:1, borderColor:'rgba(255,255,255,0.22)',
+            alignItems:'center', justifyContent:'center',
+          }}>
+            <Feather name="x" size={20} color="#FFF" />
+          </TouchableOpacity>
+
+          {/* Título com badge pulsante */}
+          <View style={{ flex:1, alignItems:'center', paddingHorizontal:10 }}>
+            <View style={{ flexDirection:'row', alignItems:'center', gap:6, backgroundColor:'rgba(255,255,255,0.08)', paddingHorizontal:14, paddingVertical:6, borderRadius:16, borderWidth:1, borderColor:'rgba(255,255,255,0.16)' }}>
+              <Animated.View style={{ width:6, height:6, borderRadius:3, backgroundColor: acColor, opacity: glowAnim.interpolate({ inputRange:[0,1], outputRange:[0.5,1] }) }} />
+              <Text style={{
+                color:'#FFF', fontSize:13.5*fontScale, fontWeight:'900', letterSpacing:0.2,
+              }}>
+                {scanMode === 'barcode' ? 'Código de Barras' : 'IA Vision'}
+              </Text>
+            </View>
+            <Text style={{ color: acColor, fontSize:10.5*fontScale, fontWeight:'700', marginTop:5 }}>
+              {scanMode === 'barcode' ? 'EAN-13 · EAN-8 · QR · Code128' : 'Powered by Gemini'}
+            </Text>
+          </View>
+
+          {/* Flash */}
+          <Animated.View style={{ transform:[{ scale: torchScale }] }}>
+            <TouchableOpacity onPress={pressTorch} activeOpacity={0.8} style={{
+              width:46, height:46, borderRadius:18,
+              backgroundColor: torchOn ? '#FCD34D' : 'rgba(255,255,255,0.10)',
+              borderWidth:1,
+              borderColor: torchOn ? '#FCD34D' : 'rgba(255,255,255,0.22)',
+              alignItems:'center', justifyContent:'center',
+              shadowColor: torchOn ? '#FCD34D' : '#000',
+              shadowOpacity: torchOn ? 0.8 : 0.2,
+              shadowRadius: torchOn ? 18 : 4,
+              elevation: torchOn ? 12 : 3,
+            }}>
+              <Feather name="zap" size={19} color={torchOn ? '#3A2A00' : '#FFF'} />
+            </TouchableOpacity>
+          </Animated.View>
+        </Animated.View>
+
+        {/* ════════════════════════════════════════════════════
+             OVERLAY "CONSULTANDO FONTES" — redesenhado do zero
+        ════════════════════════════════════════════════════ */}
+        {showAchandoGif && (
+          <View style={{
+            ...StyleSheet.absoluteFillObject,
+            backgroundColor:'rgba(5,4,16,0.97)',
+            alignItems:'center', justifyContent:'center',
+            zIndex:999,
+          }}>
+            {/* ── Bloco único: agrupa anéis+ícone+textos+cards para centralizar o CONJUNTO, não cada peça isoladamente ── */}
+            <View style={{ alignItems:'center', justifyContent:'center', position:'relative' }}>
+              {/* Glow de fundo suave atrás dos anéis — centrado matematicamente sobre o bloco do ícone (104x104) */}
+              <View pointerEvents="none" style={{ position:'absolute', top: 52 - 140, left: 52 - 140, width:280, height:280, borderRadius:140, backgroundColor:'#7C5CFF', opacity:0.06 }} />
+
+              {/* Anéis de pulso + ícone — agrupados num bloco de altura fixa (104px), centralizados entre si */}
+              <View style={{ width:104, height:104, alignItems:'center', justifyContent:'center' }}>
+                {[ring1, ring2, ring3].map((anim, idx) => (
+                  <Animated.View key={idx} style={{
+                    position:'absolute',
+                    width:RINGSZ, height:RINGSZ, borderRadius:RINGSZ/2,
+                    borderWidth: idx===0 ? 2.5 : idx===1 ? 1.5 : 1,
+                    borderColor: idx===1 ? '#A78BFA' : '#7C5CFF',
+                    transform:[{ scale: anim }],
+                    opacity: anim.interpolate({ inputRange:[0.5,1,1.55], outputRange:[0.7,0.35,0] }),
+                  }} />
+                ))}
+
+                {/* Ícone central — anel duplo com badge de fonte ativa no canto */}
+                <Animated.View style={{
+                  width:80, height:80, borderRadius:24,
+                  backgroundColor:'rgba(124,92,255,0.16)',
+                  borderWidth:2, borderColor:'rgba(124,92,255,0.55)',
+                  alignItems:'center', justifyContent:'center',
+                  shadowColor:'#7C5CFF', shadowOpacity:0.85, shadowRadius:30, elevation:20,
+                  transform:[{ rotate }],
+                }}>
+                  <MaterialCommunityIcons name="barcode-scan" size={34} color="#A78BFA" />
+                </Animated.View>
+                {/* Badge da fonte ativa, sobreposto no canto do ícone */}
+                <Animated.View style={{
+                  position:'absolute', bottom:-4, right:-4,
+                  width:34, height:34, borderRadius:12,
+                  backgroundColor: src.color, alignItems:'center', justifyContent:'center',
+                  borderWidth:2.5, borderColor:'#05040F',
+                  opacity: srcFade,
+                }}>
+                  <Feather name={src.icon} size={14} color="#FFF" />
+                </Animated.View>
+              </View>
+
+              {/* Textos animados */}
+              <Animated.View style={{
+                marginTop:30, alignItems:'center',
+                transform:[{ translateY: textSlide }],
+                opacity: textOpac,
+              }}>
+                <Text style={{ color:'#FFF', fontSize:21, fontWeight:'900', letterSpacing:-0.4, marginBottom:5, textAlign:'center' }}>
+                  Consultando fontes{dots}
+                </Text>
+                <Text style={{ color:'rgba(255,255,255,0.42)', fontSize:12.5, fontWeight:'600', marginBottom:22, textAlign:'center' }}>
+                  Buscando dados do produto em tempo real
+                </Text>
+
+                {/* Cards de fonte — estilo stepper horizontal, fonte ativa em destaque */}
+                <View style={{ flexDirection:'row', gap:8, justifyContent:'center' }}>
+                  {SOURCES.map((s, i) => {
+                    const isActive = i === activeSrc;
+                    return (
+                      <Animated.View key={i} style={{
+                        flexDirection:'row', alignItems:'center', gap:6,
+                        paddingHorizontal: isActive ? 14 : 10, paddingVertical:8,
+                        backgroundColor: isActive ? s.color+'22' : 'rgba(255,255,255,0.05)',
+                        borderRadius:16, borderWidth:1.5,
+                        borderColor: isActive ? s.color+'70' : 'rgba(255,255,255,0.1)',
+                        opacity: isActive ? srcFade : 0.5,
+                      }}>
+                        <Feather name={s.icon} size={12} color={isActive ? s.color : 'rgba(255,255,255,0.4)'} />
+                        {isActive && <Text style={{ color:s.color, fontWeight:'800', fontSize:12 }}>{s.label}</Text>}
+                      </Animated.View>
+                    );
+                  })}
+                </View>
+              </Animated.View>
+            </View>
+          </View>
+        )}
+      </View>
+    </Modal>
+  );
+};
+
+// ════════════════════════════════════════════════════════════════════════════
+//  ROBOBGIF PREMIUM  ─  Substitui o <Modal visible={showRoboGif}> antigo
+//  (IA Vision "Produto Identificado" — sem GIF estático, animação pura)
+// ════════════════════════════════════════════════════════════════════════════
+const RoboGifPremium = ({ roboMsg, T, fontScale }) => {
+  const scaleA  = useRef(new Animated.Value(0.55)).current;
+  const opacA   = useRef(new Animated.Value(0)).current;
+  const checkA  = useRef(new Animated.Value(0)).current;
+  const ring1A  = useRef(new Animated.Value(0.7)).current;
+  const ring2A  = useRef(new Animated.Value(0.7)).current;
+  const textSl  = useRef(new Animated.Value(18)).current;
+  const textOp  = useRef(new Animated.Value(0)).current;
+  const iconRot = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    scaleA.setValue(0.55); opacA.setValue(0); checkA.setValue(0);
+    ring1A.setValue(0.7); ring2A.setValue(0.7);
+    textSl.setValue(18); textOp.setValue(0); iconRot.setValue(0);
+
+    const rotLoop = Animated.loop(
+      Animated.timing(iconRot, { toValue:1, duration:3000, easing:Easing.linear, useNativeDriver:true })
+    );
+
+    Animated.sequence([
+      Animated.parallel([
+        Animated.timing(opacA,  { toValue:1, duration:200, useNativeDriver:true }),
+        Animated.spring(scaleA, { toValue:1, tension:140, friction:8, useNativeDriver:true }),
+      ]),
+      Animated.parallel([
+        Animated.spring(checkA, { toValue:1, tension:200, friction:7, useNativeDriver:true }),
+        Animated.loop(Animated.sequence([
+          Animated.parallel([
+            Animated.timing(ring1A, { toValue:1.5, duration:900, easing:Easing.out(Easing.cubic), useNativeDriver:true }),
+            Animated.timing(ring2A, { toValue:1.75, duration:1100, delay:160, easing:Easing.out(Easing.cubic), useNativeDriver:true }),
+          ]),
+          Animated.timing(ring1A, { toValue:0.7, duration:0, useNativeDriver:true }),
+          Animated.timing(ring2A, { toValue:0.7, duration:0, useNativeDriver:true }),
+        ])),
+        Animated.timing(textSl, { toValue:0, duration:340, delay:140, easing:Easing.out(Easing.cubic), useNativeDriver:true }),
+        Animated.timing(textOp, { toValue:1, duration:300, delay:140, useNativeDriver:true }),
+      ]),
+    ]).start();
+    rotLoop.start();
+    return () => rotLoop.stop();
+  }, [roboMsg]);
+
+  const green    = '#22C55E';
+  const ICSZ     = 96;
+  const prodName = String(roboMsg || '').split('\n').slice(1).join(' ').trim();
+  const rotDeg   = iconRot.interpolate({ inputRange:[0,1], outputRange:['0deg','360deg'] });
+
+  return (
+    <View style={{ flex:1, backgroundColor:'rgba(0,8,24,0.95)', justifyContent:'center', alignItems:'center', paddingHorizontal:24 }}>
+      {/* Anéis */}
+      {[ring1A, ring2A].map((anim, idx) => (
+        <Animated.View key={idx} style={{
+          position:'absolute',
+          width: ICSZ * (idx===0 ? 2.4 : 3.1),
+          height: ICSZ * (idx===0 ? 2.4 : 3.1),
+          borderRadius: ICSZ * (idx===0 ? 1.2 : 1.55),
+          borderWidth: idx===0 ? 2 : 1.5,
+          borderColor: green,
+          transform:[{ scale: anim }],
+          opacity: anim.interpolate({ inputRange:[0.7,1,idx===0?1.5:1.75], outputRange:[0.5,0.2,0] }),
+        }} />
+      ))}
+
+      {/* Círculo ícone */}
+      <Animated.View style={{
+        width:ICSZ, height:ICSZ, borderRadius:ICSZ/2,
+        backgroundColor: green+'1A',
+        borderWidth:2.5, borderColor:green,
+        alignItems:'center', justifyContent:'center',
+        transform:[{ scale: scaleA }],
+        shadowColor:green, shadowOpacity:0.8, shadowRadius:36, elevation:24,
+        opacity: opacA,
+      }}>
+        <Animated.View style={{ transform:[{ rotate: rotDeg }] }}>
+          <MaterialCommunityIcons name="robot-excited-outline" size={46} color={green} />
+        </Animated.View>
+        {/* Check badge */}
+        <Animated.View style={{
+          position:'absolute', bottom:-4, right:-4,
+          width:28, height:28, borderRadius:14,
+          backgroundColor: green,
+          alignItems:'center', justifyContent:'center',
+          transform:[{ scale: checkA }],
+          shadowColor:green, shadowOpacity:0.8, shadowRadius:8, elevation:8,
+        }}>
+          <Feather name="check" size={14} color="#FFF" />
+        </Animated.View>
+      </Animated.View>
+
+      {/* Textos */}
+      <Animated.View style={{
+        marginTop:32, alignItems:'center', paddingHorizontal:20,
+        transform:[{ translateY: textSl }],
+        opacity: textOp,
+      }}>
+        {/* Badge "IA Vision" */}
+        <View style={{
+          flexDirection:'row', alignItems:'center', gap:6,
+          backgroundColor:'rgba(79,116,255,0.12)',
+          paddingHorizontal:14, paddingVertical:6,
+          borderRadius:20, borderWidth:1.5, borderColor:'rgba(79,116,255,0.35)',
+          marginBottom:16,
+        }}>
+          <View style={{ width:8, height:8, borderRadius:4, backgroundColor:'#4F74FF' }} />
+          <Text style={{ fontSize:11*(fontScale||1), fontWeight:'900', color:'#4F74FF', letterSpacing:1.5, textTransform:'uppercase' }}>
+            IA Vision · GEI.AI
+          </Text>
+        </View>
+
+        {/* Nome do produto */}
+        <Text style={{ color:green, fontSize:12*(fontScale||1), fontWeight:'900', letterSpacing:2, textTransform:'uppercase', marginBottom:8 }}>
+          Produto Identificado!
+        </Text>
+        <Text style={{
+          color:'#FFF', fontSize:17*(fontScale||1), fontWeight:'900',
+          textAlign:'center', lineHeight:24,
+        }} numberOfLines={3}>
+          {prodName || 'Produto identificado com sucesso'}
+        </Text>
+
+        {/* Status "abrindo cadastro" */}
+        <View style={{
+          flexDirection:'row', alignItems:'center', gap:8, marginTop:20,
+          backgroundColor: green+'14',
+          paddingHorizontal:16, paddingVertical:9,
+          borderRadius:20, borderWidth:1.5, borderColor: green+'35',
+        }}>
+          <Feather name="check-circle" size={14} color={green} />
+          <Text style={{ fontSize:12*(fontScale||1), fontWeight:'800', color:green }}>Cadastro sendo aberto...</Text>
+        </View>
+      </Animated.View>
+    </View>
   );
 };
 
@@ -9805,7 +10652,7 @@ export default function App() {
       setRoboMsg(`Encontrei!\n${nome.trim()}`);
       setShowRoboGif(true);
       setTimeout(() => { setProdName(nome.trim()); setGiro(r.rotatividade || 'Médio giro'); resetWiz(); }, 80);
-      setTimeout(() => { setShowRoboGif(false); navTo('cadastro'); }, 4000);
+      setTimeout(() => { setShowRoboGif(false); navTo('cadastro'); }, 1600);
     } catch (ex) {
       showErr(`Erro na análise visual: ${ex.message}`);
       setScanning(false); setBusy(false);
@@ -9824,7 +10671,35 @@ export default function App() {
   }, [stockData, activeFilter, searchQuery]);
   const counts = useMemo(() => { const base = stockData.filter(i => String(i.produto || '').trim() || (String(i.codig || '').trim() && String(i.codig || '') !== 'Sem EAN')); return { all: base.length, ok: base.filter(i => vencStatus(i.VENCIMENTO).status === 'ok').length, warning30: base.filter(i => vencStatus(i.VENCIMENTO).status === 'warning30').length, warning: base.filter(i => vencStatus(i.VENCIMENTO).status === 'warning').length, expired: base.filter(i => vencStatus(i.VENCIMENTO).status === 'expired').length }; }, [stockData]);
   const triggerAutoClean = useCallback(async () => { setCleanToast({ cleaning: true }); try { const deleted = await runAutoClean(); if (deleted.length > 0 && activeShelf) loadStock(activeShelf); setCleanToast({ cleaning: false, deleted }); await addAuditLog('AUTO_CLEAN', `${deleted.length} produtos removidos`, userData?.id); } catch (_) { setCleanToast({ cleaning: false, deleted: [] }); } }, [activeShelf, userData, loadStock]);
-  const loadStock = useCallback(async shelf => { const tid = SHELVES[shelf]; if (!tid) return; try { const res = await secureAxiosInstance.get(`https://api.baserow.io/api/database/rows/table/${tid}/?user_field_names=true&size=200`); const products = res.data.results || []; setStockData(prev => { /* PATCH: preserva itens otimistas (temp-*) e itens recentes ainda nao indexados pelo Baserow */ const serverIds = new Set(products.map(p => p.id)); const localOnly = (prev || []).filter(p => String(p.id || '').startsWith('temp-') || !serverIds.has(p.id)); /* mantem apenas itens locais com menos de 30s para nao acumular fantasmas */ const now = Date.now(); const fresh = localOnly.filter(p => !p._localTs || (now - p._localTs) < 30000); return sortProductsByDate([...fresh, ...products]); }); agendarTercaSemanal(products).catch(()=>{}); verificarTercaHoje(products).catch(()=>{}); } catch (ex) { showErr('Erro ao carregar dados da prateleira.'); } }, [showErr]);
+  const loadStock = useCallback(async shelf => { const tid = SHELVES[shelf]; if (!tid) return; try { const res = await secureAxiosInstance.get(`https://api.baserow.io/api/database/rows/table/${tid}/?user_field_names=true&size=200`); const products = res.data.results || []; setStockData(prev => { /* PATCH: preserva itens otimistas (temp-*) SOMENTE se forem da MESMA prateleira que está sendo recarregada — evita misturar estoque de prateleiras diferentes ao trocar de prateleira */ const serverIds = new Set(products.map(p => p.id)); const now = Date.now(); const localOnly = (prev || []).filter(p => { const sameShelf = p._shelf === shelf; if (!sameShelf) return false; /* item de outra prateleira nunca é preservado */ const isTemp = String(p.id || '').startsWith('temp-'); const isMissingFromServer = !serverIds.has(p.id); if (!isTemp && !isMissingFromServer) return false; const fresh = !p._localTs || (now - p._localTs) < 30000; return fresh; }); const tagged = products.map(p => ({ ...p, _shelf: shelf })); return sortProductsByDate([...localOnly, ...tagged]); }); agendarTercaSemanal(products).catch(()=>{}); verificarTercaHoje(products).catch(()=>{}); verificarRupturaHoje(products, fifoMode, shelf, shlabel(shelf)).catch(()=>{}); } catch (ex) { showErr('Erro ao carregar dados da prateleira.'); } }, [showErr, fifoMode]);
+
+  // ── Auto-atualização do estoque a cada 8 segundos ──────────────────────────
+  // Mantém a lista sempre sincronizada com o Baserow sem precisar de ação manual.
+  // Pausa quando o app vai para background (economiza dados/bateria) e retoma
+  // imediatamente ao voltar ao foreground. Roda silenciosamente (sem loaders).
+  const stockPollRef = useRef(null);
+  const appStateForPollRef = useRef(AppState.currentState);
+  useEffect(() => {
+    const tick = () => {
+      if (appStateForPollRef.current !== 'active') return;
+      const shelfToPoll = activeShelf;
+      if (isLogged && shelfToPoll) loadStock(shelfToPoll);
+    };
+    if (stockPollRef.current) clearInterval(stockPollRef.current);
+    if (isLogged && activeShelf) {
+      stockPollRef.current = setInterval(tick, 8000);
+    }
+    return () => { if (stockPollRef.current) clearInterval(stockPollRef.current); };
+  }, [isLogged, activeShelf, loadStock]);
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', s => {
+      const wasBackground = appStateForPollRef.current !== 'active';
+      appStateForPollRef.current = s;
+      // ✅ ao retornar do background, força uma atualização imediata (não espera os 8s)
+      if (s === 'active' && wasBackground && isLogged && activeShelf) loadStock(activeShelf);
+    });
+    return () => sub.remove();
+  }, [isLogged, activeShelf, loadStock]);
 
   // ── Auto-ativa FIFO quando detecta ≥4 produtos com mesmo nome OU ≥2 com mesmo EAN ──
   React.useEffect(() => {
@@ -9833,6 +10708,28 @@ export default function App() {
     if (hasFifo) setFifoMode(true);
   }, [stockData]);
   const deleteProduct = useCallback(async (product) => { if (!product?.id) return; const tableId = SHELVES[activeShelf]; if (!tableId) { showErr('Nenhuma prateleira ativa para apagar o produto.'); return; } setBusy(true); setBusyMsg('Apagando produto...'); try { await secureAxiosInstance.delete(`https://api.baserow.io/api/database/rows/table/${tableId}/${product.id}/`); await addAuditLog('PRODUCT_DELETED', `Produto "${product.produto}" apagado da prateleira ${activeShelf}`, userData?.id); setStockData(prev => sortProductsByDate(prev.filter(p => p.id !== product.id))); } catch (ex) { showErr('Não foi possível apagar o produto. Verifique a conexão.'); } finally { setBusy(false); } }, [activeShelf, showErr, userData]);
+
+  // ── Atualizar quantidade do produto (botão "+ Adicionar Quantidade" no detalhe) ──
+  // Soma `addQty` à quantidade atual e salva no Baserow via PATCH. Atualização
+  // otimista no stockData local para refletir na tela na hora, sem esperar o
+  // próximo ciclo do polling de 8s.
+  const updateProductQuantity = useCallback(async (product, addQty) => {
+    if (!product?.id || !addQty || addQty <= 0) return;
+    const tableId = SHELVES[activeShelf];
+    if (!tableId) { showErr('Nenhuma prateleira ativa para atualizar a quantidade.'); return; }
+    const currentQty = Math.max(0, parseInt(product.quantidade, 10) || 0);
+    const newQty = currentQty + addQty;
+    setBusy(true); setBusyMsg('Atualizando quantidade...');
+    try {
+      await secureAxiosInstance.patch(`https://api.baserow.io/api/database/rows/table/${tableId}/${product.id}/?user_field_names=true`, { quantidade: String(newQty) });
+      await addAuditLog('PRODUCT_QTY_UPDATED', `Quantidade de "${product.produto}" alterada de ${currentQty} para ${newQty} (+${addQty}) na prateleira ${activeShelf}`, userData?.id);
+      setStockData(prev => sortProductsByDate(prev.map(p => p.id === product.id ? { ...p, quantidade: String(newQty) } : p)));
+    } catch (ex) {
+      showErr('Não foi possível atualizar a quantidade. Verifique a conexão.');
+    } finally {
+      setBusy(false);
+    }
+  }, [activeShelf, showErr, userData]);
 
   const updateLastLogin = async (userId) => { try { const now = new Date(); const novoLogin = { data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), iso: now.toISOString() }; let historicoAtual = []; try { const resUser = await secureAxiosInstance.get(`https://api.baserow.io/api/database/rows/table/221009/${userId}/?user_field_names=true`); const utimologin = resUser.data?.UTIMOLOGIN || ''; if (utimologin.startsWith('[')) { historicoAtual = JSON.parse(utimologin); } else if (utimologin) { historicoAtual = [{ data: utimologin, hora: '', iso: '' }]; } } catch (_) { historicoAtual = []; } const historicoAtualizado = [novoLogin, ...historicoAtual].slice(0, 3); await secureAxiosInstance.patch(`https://api.baserow.io/api/database/rows/table/221009/${userId}/?user_field_names=true`, { UTIMOLOGIN: JSON.stringify(historicoAtualizado) }); } catch (error) { console.warn('Nao foi possivel atualizar ultimo login', error); } };
   const handleChangePassword = async (currentPass, newPass) => { if (!userData) return false; try { const res = await secureAxiosInstance.get(`https://api.baserow.io/api/database/rows/table/221009/?user_field_names=true`); const user = res.data.results.find(u => u.id === userData.id); if (!user || user.SENHA !== currentPass) { AppAlert.alert('Erro', 'Senha atual incorreta.'); return false; } await secureAxiosInstance.patch(`https://api.baserow.io/api/database/rows/table/221009/${userData.id}/?user_field_names=true`, { SENHA: newPass }); await addAuditLog('PASSWORD_CHANGED', 'Senha alterada com sucesso', userData.id); AppAlert.alert('Sucesso', 'Sua senha foi alterada.'); return true; } catch (error) { AppAlert.alert('Erro', 'Não foi possível alterar a senha. Tente novamente.'); return false; } };
@@ -10386,7 +11283,7 @@ export default function App() {
         };
 
         const tempId = 'temp-' + Date.now();
-        const newProd = { ...baserowData, id: tempId, _localTs: Date.now(), _justAdded: true };
+        const newProd = { ...baserowData, id: tempId, _localTs: Date.now(), _justAdded: true, _shelf: shelf };
 
         // Se a IA cadastrou em uma prateleira diferente da ativa, avisa e troca automaticamente
         let shelfChangedMsg = '';
@@ -11008,29 +11905,86 @@ export default function App() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1, backgroundColor: T.bg }}>
         <StatusBar hidden />
         <View style={{ paddingTop: 16 }}><ErrBanner msg={erro} onClose={() => setErro('')} /></View>
-        <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 26, paddingTop: 60, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <Text style={{ fontSize: 56, fontWeight: '900', color: T.text, letterSpacing: -2.5, textAlign: 'center' }}>GEI<Text style={{ color: T.blue }}>.AI</Text></Text>
-          <Text style={{ fontSize: 10, letterSpacing: 5, color: T.textSub, marginTop: 6, marginBottom: 40, fontWeight: '700', textAlign: 'center' }}>GESTÃO DE ESTOQUE INTEGRADO</Text>
-          <View style={{ backgroundColor: T.bgCard, borderRadius: 24, padding: 24, borderWidth: 1, borderColor: T.border }}>
-            <Text style={{ fontSize: 22, fontWeight: '900', color: T.text, marginBottom: 6 }}>Bem-vindo de volta</Text>
-            <Text style={{ fontSize: 14, color: T.textSub, marginBottom: 24, lineHeight: 20 }}>Acesse sua conta para gerenciar o estoque em tempo real.</Text>
-            {lockedOut && (<View style={{ backgroundColor: T.redGlow, borderRadius: 18, padding: 18, marginBottom: 20, borderWidth: 2, borderColor: T.red + '50', alignItems: 'center', gap: 12 }}><View style={{ width: 56, height: 56, borderRadius: 18, backgroundColor: T.red + '20', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: T.red + '50' }}><Feather name="lock" size={28} color={T.red} /></View><View style={{ alignItems: 'center' }}><Text style={{ fontSize: 15, fontWeight: '900', color: T.red, textAlign: 'center' }}>Acesso temporariamente bloqueado</Text><Text style={{ fontSize: 13, color: T.textSub, marginTop: 4, textAlign: 'center' }}>Muitas tentativas incorretas. Aguarde para continuar.</Text></View><View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: T.red + '18', borderWidth: 3, borderColor: T.red, justifyContent: 'center', alignItems: 'center' }}><Text style={{ fontSize: 26, fontWeight: '900', color: T.red, letterSpacing: -1 }}>{lockoutRemaining}</Text><Text style={{ fontSize: 8, fontWeight: '800', color: T.red, textTransform: 'uppercase', letterSpacing: 0.5 }}>seg</Text></View><View style={{ width: '100%', height: 6, backgroundColor: T.border, borderRadius: 3, overflow: 'hidden' }}><View style={{ height: '100%', backgroundColor: T.red, borderRadius: 3, width: `${(lockoutRemaining / LOCKOUT_SECS) * 100}%` }} /></View><Text style={{ fontSize: 11, color: T.textMuted, fontWeight: '700', textAlign: 'center' }}>{MAX_LOGIN_ATTEMPTS} tentativas incorretas detectadas. Por segurança, o acesso foi suspenso temporariamente.</Text></View>)}
-            {!lockedOut && failedAttempts > 0 && failedAttempts < MAX_LOGIN_ATTEMPTS && (<View style={{ backgroundColor: T.amberGlow, borderRadius: 14, padding: 14, marginBottom: 16, borderWidth: 1.5, borderColor: T.amber + '50', flexDirection: 'row', alignItems: 'center', gap: 10 }}><Feather name="alert-triangle" size={20} color={T.amber} /><View style={{ flex: 1 }}><Text style={{ fontSize: 13, fontWeight: '800', color: T.amber }}>Atenção: {failedAttempts}/{MAX_LOGIN_ATTEMPTS} tentativas usadas</Text><Text style={{ fontSize: 11, color: T.textSub, marginTop: 2 }}>Após {MAX_LOGIN_ATTEMPTS} tentativas, o acesso será bloqueado por {LOCKOUT_SECS}s.</Text></View><View style={{ flexDirection: 'row', gap: 4 }}>{Array.from({ length: MAX_LOGIN_ATTEMPTS }).map((_, i) => (<View key={i} style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: i < failedAttempts ? T.red : T.border }} />))}</View></View>)}
-            <View style={{ gap: 16, marginBottom: 24 }}>
-              <View><Text style={{ fontSize: 13, fontWeight: '800', color: T.textSub, marginBottom: 8, marginLeft: 4 }}>E-MAIL</Text><TextInput style={{ backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: T.border, padding: 16, borderRadius: 16, fontSize: 15, color: T.text, opacity: lockedOut ? 0.5 : 1 }} placeholder="seu@email.com" placeholderTextColor={T.textMuted} value={emailIn} onChangeText={v => setEmailIn(v.toLowerCase())} autoCapitalize="none" keyboardType="email-address" editable={!lockedOut} /></View>
-              <View><Text style={{ fontSize: 13, fontWeight: '800', color: T.textSub, marginBottom: 8, marginLeft: 4 }}>SENHA</Text><CapsLockDetector onCapsLockChange={setCapsLockActive}>{({ ref, onKeyPress, isCapsLock }) => (<View><View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: isCapsLock ? T.amber : T.border, borderRadius: 16, paddingRight: 12, opacity: lockedOut ? 0.5 : 1 }}><TextInput ref={ref} style={{ flex: 1, padding: 16, fontSize: 15, color: T.text }} placeholder="••••••••" placeholderTextColor={T.textMuted} value={passIn} onChangeText={setPassIn} secureTextEntry={!showPass} editable={!lockedOut} onKeyPress={onKeyPress} /><TouchableOpacity onPress={() => setShowPass(!showPass)} disabled={lockedOut}><Feather name={showPass ? 'eye' : 'eye-off'} size={20} color={T.textSub} /></TouchableOpacity></View>{isCapsLock && (<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 }}><Feather name="alert-triangle" size={12} color={T.amber} /><Text style={{ fontSize: 11, color: T.amber, fontWeight: '600' }}>CAPS LOCK está ativado</Text></View>)}</View>)}</CapsLockDetector></View>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, paddingTop: 52, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+          {/* ── Identidade visual redesenhada: selo circular + wordmark ── */}
+          <View style={{ alignItems: 'center', marginBottom: 36 }}>
+            <View style={{ width: 84, height: 84, borderRadius: 28, backgroundColor: T.blueGlow, borderWidth: 1.5, borderColor: T.borderMid, justifyContent: 'center', alignItems: 'center', marginBottom: 18, shadowColor: T.blue, shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.22, shadowRadius: 22, elevation: 8 }}>
+              <View style={{ width: 56, height: 56, borderRadius: 18, backgroundColor: T.blue, justifyContent: 'center', alignItems: 'center' }}>
+                <MaterialCommunityIcons name="cube-scan" size={30} color="#FFF" />
+              </View>
             </View>
-            {loading ? <ActivityIndicator size="large" color={T.blue} style={{ marginVertical: 12 }} /> : <PrimaryBtn label={lockedOut ? `Bloqueado por ${lockoutRemaining}s` : 'Entrar no Painel'} onPress={() => doLogin(emailIn, passIn)} color={lockedOut ? T.textMuted : T.blue} style={{ opacity: lockedOut ? 0.6 : 1 }} />}
-            {biometricEnabled && !lockedOut && (<TouchableOpacity style={{ marginTop: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 12 }} onPress={() => doLogin('', '', true)}><Feather name="fingerprint" size={20} color={T.blue} /><Text style={{ color: T.blue, fontWeight: '600', fontSize: 14 }}>Entrar com Biometria</Text></TouchableOpacity>)}
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 24 }}><View style={{ flex: 1, height: 1, backgroundColor: T.border }} /><Text style={{ paddingHorizontal: 16, color: T.textMuted, fontSize: 12, fontWeight: '800' }}>OU</Text><View style={{ flex: 1, height: 1, backgroundColor: T.border }} /></View>
-            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 12 }}>
-              <TouchableOpacity style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 14, borderRadius: 16, borderWidth: 1.5, borderColor: T.blue + '40', backgroundColor: T.blueGlow }} onPress={() => setAuthMode('qrScanner')}><Feather name="maximize" size={18} color={T.blue} /><Text style={{ color: T.blue, fontWeight: '800' }}>QR Code</Text></TouchableOpacity>
-              <TouchableOpacity style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 14, borderRadius: 16, borderWidth: 1.5, borderColor: T.purple + '40', backgroundColor: T.purpleGlow }} onPress={() => setAuthMode('register')}><Feather name="user-plus" size={18} color={T.purple} /><Text style={{ color: T.purple, fontWeight: '800' }}>Cadastrar</Text></TouchableOpacity>
+            <Text style={{ fontSize: 38, fontWeight: '900', color: T.text, letterSpacing: -1.5 }}>GEI<Text style={{ color: T.blue }}>.AI</Text></Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8, backgroundColor: T.bgElevated, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: T.border }}>
+              <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: T.green }} />
+              <Text style={{ fontSize: 11, letterSpacing: 1.5, color: T.textSub, fontWeight: '800' }}>GESTÃO INTELIGENTE DE ESTOQUE</Text>
             </View>
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 14, borderRadius: 16, borderWidth: 1.5, borderColor: T.orange + '40', backgroundColor: T.orangeGlow }} onPress={() => setAuthMode('admin')}><Feather name="shield" size={18} color={T.orange} /><Text style={{ color: T.orange, fontWeight: '800' }}>Admin</Text></TouchableOpacity>
-            <TouchableOpacity style={{ alignSelf: 'center', marginTop: 16, flexDirection: 'row', alignItems: 'center', gap: 6 }} onPress={() => setShowRastreioModal(true)}><Feather name="search" size={16} color={T.textSub} /><Text style={{ color: T.textSub, fontSize: 13, fontWeight: '600' }}>Verificar acesso com código de rastreio</Text></TouchableOpacity>
           </View>
-          <Text style={{ marginTop: 32, textAlign: 'center', color: T.textMuted, fontSize: 12, fontWeight: '600' }}>GEI.AI v5.0 Secure · 2026</Text>
+          <View style={{ backgroundColor: T.bgCard, borderRadius: 28, padding: 24, borderWidth: 1, borderColor: T.border, shadowColor: T.accent, shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.06, shadowRadius: 24, elevation: 3 }}>
+            <Text style={{ fontSize: 21, fontWeight: '900', color: T.text, marginBottom: 4 }}>Bem-vindo de volta</Text>
+            <Text style={{ fontSize: 13.5, color: T.textSub, marginBottom: 26, lineHeight: 19 }}>Entre para acompanhar o estoque em tempo real.</Text>
+            {lockedOut && (
+              <View style={{ backgroundColor: T.redGlow, borderRadius: 20, padding: 18, marginBottom: 20, borderWidth: 1.5, borderColor: T.red + '40', alignItems: 'center', gap: 12 }}>
+                <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: T.red + '18', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: T.red }}>
+                  <Text style={{ fontSize: 22, fontWeight: '900', color: T.red }}>{lockoutRemaining}</Text>
+                </View>
+                <View style={{ alignItems: 'center' }}>
+                  <Text style={{ fontSize: 14.5, fontWeight: '900', color: T.red, textAlign: 'center' }}>Acesso bloqueado temporariamente</Text>
+                  <Text style={{ fontSize: 12.5, color: T.textSub, marginTop: 3, textAlign: 'center' }}>Muitas tentativas incorretas. Aguarde a contagem.</Text>
+                </View>
+                <View style={{ width: '100%', height: 5, backgroundColor: T.border, borderRadius: 3, overflow: 'hidden' }}><View style={{ height: '100%', backgroundColor: T.red, borderRadius: 3, width: `${(lockoutRemaining / LOCKOUT_SECS) * 100}%` }} /></View>
+              </View>
+            )}
+            {!lockedOut && failedAttempts > 0 && failedAttempts < MAX_LOGIN_ATTEMPTS && (
+              <View style={{ backgroundColor: T.amberGlow, borderRadius: 16, padding: 14, marginBottom: 18, borderWidth: 1, borderColor: T.amber + '40', flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <Feather name="alert-triangle" size={18} color={T.amber} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 12.5, fontWeight: '800', color: T.amber }}>{failedAttempts}/{MAX_LOGIN_ATTEMPTS} tentativas usadas</Text>
+                </View>
+                <View style={{ flexDirection: 'row', gap: 4 }}>{Array.from({ length: MAX_LOGIN_ATTEMPTS }).map((_, i) => (<View key={i} style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: i < failedAttempts ? T.red : T.border }} />))}</View>
+              </View>
+            )}
+            <View style={{ gap: 14, marginBottom: 22 }}>
+              <View>
+                <Text style={{ fontSize: 12, fontWeight: '800', color: T.textSub, marginBottom: 7, marginLeft: 4, letterSpacing: 0.5 }}>E-MAIL</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: T.border, borderRadius: 16, paddingLeft: 14, opacity: lockedOut ? 0.5 : 1 }}>
+                  <Feather name="mail" size={16} color={T.textMuted} />
+                  <TextInput style={{ flex: 1, padding: 14, paddingLeft: 10, fontSize: 15, color: T.text }} placeholder="seu@email.com" placeholderTextColor={T.textMuted} value={emailIn} onChangeText={v => setEmailIn(v.toLowerCase())} autoCapitalize="none" keyboardType="email-address" editable={!lockedOut} />
+                </View>
+              </View>
+              <View>
+                <Text style={{ fontSize: 12, fontWeight: '800', color: T.textSub, marginBottom: 7, marginLeft: 4, letterSpacing: 0.5 }}>SENHA</Text>
+                <CapsLockDetector onCapsLockChange={setCapsLockActive}>{({ ref, onKeyPress, isCapsLock }) => (
+                  <View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderWidth: 1.5, borderColor: isCapsLock ? T.amber : T.border, borderRadius: 16, paddingLeft: 14, paddingRight: 12, opacity: lockedOut ? 0.5 : 1 }}>
+                      <Feather name="lock" size={16} color={T.textMuted} />
+                      <TextInput ref={ref} style={{ flex: 1, padding: 14, paddingLeft: 10, fontSize: 15, color: T.text }} placeholder="••••••••" placeholderTextColor={T.textMuted} value={passIn} onChangeText={setPassIn} secureTextEntry={!showPass} editable={!lockedOut} onKeyPress={onKeyPress} />
+                      <TouchableOpacity onPress={() => setShowPass(!showPass)} disabled={lockedOut}><Feather name={showPass ? 'eye' : 'eye-off'} size={18} color={T.textSub} /></TouchableOpacity>
+                    </View>
+                    {isCapsLock && (<View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 6 }}><Feather name="alert-triangle" size={12} color={T.amber} /><Text style={{ fontSize: 11, color: T.amber, fontWeight: '600' }}>Caps Lock ativado</Text></View>)}
+                  </View>
+                )}</CapsLockDetector>
+              </View>
+            </View>
+            {loading ? <ActivityIndicator size="large" color={T.blue} style={{ marginVertical: 12 }} /> : <PrimaryBtn label={lockedOut ? `Bloqueado · ${lockoutRemaining}s` : 'Entrar no Painel'} icon={lockedOut ? undefined : 'arrow-right'} onPress={() => doLogin(emailIn, passIn)} color={lockedOut ? T.textMuted : T.blue} style={{ opacity: lockedOut ? 0.6 : 1 }} />}
+            {biometricEnabled && !lockedOut && (<TouchableOpacity style={{ marginTop: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 12, backgroundColor: T.bgInput, borderRadius: 14 }} onPress={() => doLogin('', '', true)}><Feather name="fingerprint" size={18} color={T.blue} /><Text style={{ color: T.blue, fontWeight: '700', fontSize: 13.5 }}>Entrar com biometria</Text></TouchableOpacity>)}
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 22 }}><View style={{ flex: 1, height: 1, backgroundColor: T.border }} /><Text style={{ paddingHorizontal: 14, color: T.textMuted, fontSize: 11, fontWeight: '800', letterSpacing: 1 }}>OU CONTINUE COM</Text><View style={{ flex: 1, height: 1, backgroundColor: T.border }} /></View>
+            <View style={{ flexDirection: 'row', gap: 10, marginBottom: 10 }}>
+              <TouchableOpacity style={{ flex: 1, alignItems: 'center', gap: 6, padding: 14, borderRadius: 18, borderWidth: 1.5, borderColor: T.border, backgroundColor: T.bgInput }} onPress={() => setAuthMode('qrScanner')}>
+                <View style={{ width: 38, height: 38, borderRadius: 13, backgroundColor: T.blueGlow, justifyContent: 'center', alignItems: 'center' }}><Feather name="maximize" size={17} color={T.blue} /></View>
+                <Text style={{ color: T.text, fontWeight: '700', fontSize: 12.5 }}>QR Code</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{ flex: 1, alignItems: 'center', gap: 6, padding: 14, borderRadius: 18, borderWidth: 1.5, borderColor: T.border, backgroundColor: T.bgInput }} onPress={() => setAuthMode('register')}>
+                <View style={{ width: 38, height: 38, borderRadius: 13, backgroundColor: T.purpleGlow, justifyContent: 'center', alignItems: 'center' }}><Feather name="user-plus" size={17} color={T.purple} /></View>
+                <Text style={{ color: T.text, fontWeight: '700', fontSize: 12.5 }}>Cadastrar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{ flex: 1, alignItems: 'center', gap: 6, padding: 14, borderRadius: 18, borderWidth: 1.5, borderColor: T.border, backgroundColor: T.bgInput }} onPress={() => setAuthMode('admin')}>
+                <View style={{ width: 38, height: 38, borderRadius: 13, backgroundColor: T.orangeGlow, justifyContent: 'center', alignItems: 'center' }}><Feather name="shield" size={17} color={T.orange} /></View>
+                <Text style={{ color: T.text, fontWeight: '700', fontSize: 12.5 }}>Admin</Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity style={{ alignSelf: 'center', marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 6 }} onPress={() => setShowRastreioModal(true)}><Feather name="search" size={14} color={T.textSub} /><Text style={{ color: T.textSub, fontSize: 12.5, fontWeight: '600' }}>Verificar acesso com código de rastreio</Text></TouchableOpacity>
+          </View>
+          <Text style={{ marginTop: 28, textAlign: 'center', color: T.textMuted, fontSize: 11.5, fontWeight: '700', letterSpacing: 0.5 }}>GEI.AI v6.0 Aurora · 2026</Text>
         </ScrollView>
         <RastreioModal visible={showRastreioModal} onClose={() => setShowRastreioModal(false)} T={T} fontScale={fontScale} />
       </KeyboardAvoidingView>
@@ -11043,11 +11997,54 @@ export default function App() {
       <DarkTorchPrompt isDarkEnv={isDarkEnv} lightLevel={lightLevel} torchOn={torchOn} onToggleTorch={() => setTorchOn(!torchOn)} T={T} fontScale={fontScale} />
       <Modal visible={showQrGenerator} transparent animationType="fade" onRequestClose={() => setShowQrGenerator(false)}><View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center' }}><TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={() => setShowQrGenerator(false)} /><View style={{ backgroundColor: T.bgCard, borderRadius: 32, margin: 20, maxHeight: '85%', borderWidth: 1, borderColor: T.border }}><View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderBottomWidth: 1, borderColor: T.border }}><Text style={{ fontSize: 20 * fontScale, fontWeight: '900', color: T.text }}>QR Code de Acesso</Text><TouchableOpacity onPress={() => setShowQrGenerator(false)} style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: T.bgInput, justifyContent: 'center', alignItems: 'center' }}><Feather name="x" size={20} color={T.textSub} /></TouchableOpacity></View><QrCodeGenerator T={T} fontScale={fontScale} userData={userData} onClose={() => setShowQrGenerator(false)} /></View></View></Modal>
       <Modal visible={showAuditLogs} transparent animationType="fade" onRequestClose={() => setShowAuditLogs(false)}><View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-start', paddingTop: 52 }}><TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={() => setShowAuditLogs(false)} /><View style={{ backgroundColor: T.bgCard, borderRadius: 32, margin: 16, maxHeight: WIN.height * 0.99, borderWidth: 1, borderColor: T.border }}><View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1, borderColor: T.border }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}><View style={{ width: 36, height: 36, borderRadius: 11, backgroundColor: T.blueGlow, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: T.blue + '40' }}><Feather name="shield" size={18} color={T.blue} /></View><View><Text style={{ fontSize: 16 * fontScale, fontWeight: '900', color: T.text }}>Auditoria & Logins</Text><Text style={{ fontSize: 11 * fontScale, color: T.textSub, fontWeight: '600' }}>Últimos 3 dias</Text></View></View><TouchableOpacity onPress={() => setShowAuditLogs(false)} style={{ width: 38, height: 38, borderRadius: 12, backgroundColor: T.bgInput, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: T.border }}><Feather name="x" size={18} color={T.textSub} /></TouchableOpacity></View><ScrollView contentContainerStyle={{ padding: 16, gap: 8 }} showsVerticalScrollIndicator={false}>{auditLogs.loginHistory && auditLogs.loginHistory.length > 0 && (<View style={{ backgroundColor: T.bgElevated, borderRadius: 18, padding: 16, marginBottom: 4, borderWidth: 1.5, borderColor: T.blue + '35' }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}><View style={{ width: 28, height: 28, borderRadius: 9, backgroundColor: T.blueGlow, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: T.blue + '40' }}><Feather name="log-in" size={14} color={T.blue} /></View><Text style={{ fontSize: 12 * fontScale, fontWeight: '900', color: T.blue, textTransform: 'uppercase', letterSpacing: 0.8 }}>Histórico de Logins</Text><View style={{ marginLeft: 'auto', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: T.blue + '18', borderWidth: 1, borderColor: T.blue + '30' }}><Text style={{ fontSize: 10 * fontScale, fontWeight: '900', color: T.blue }}>{auditLogs.loginHistory.length} registro{auditLogs.loginHistory.length !== 1 ? 's' : ''}</Text></View></View>{auditLogs.loginHistory.map((login, idx) => (<View key={idx} style={{ flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderTopWidth: idx > 0 ? 1 : 0, borderColor: T.border }}><View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: idx === 0 ? T.green + '20' : T.bgInput, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: idx === 0 ? T.green + '50' : T.border }}><Text style={{ fontSize: 11, fontWeight: '900', color: idx === 0 ? T.green : T.textMuted }}>#{idx + 1}</Text></View><View style={{ flex: 1 }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>{idx === 0 && (<View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, backgroundColor: T.green + '18', borderWidth: 1, borderColor: T.green + '40' }}><Text style={{ fontSize: 9 * fontScale, fontWeight: '900', color: T.green }}>MAIS RECENTE</Text></View>)}<Text style={{ fontSize: 13 * fontScale, fontWeight: '800', color: idx === 0 ? T.text : T.textSub }}>{login.data || '—'}{login.hora ? `  ·  ${login.hora}` : ''}</Text></View>{login.iso ? (<Text style={{ fontSize: 10 * fontScale, color: T.textMuted, marginTop: 2, fontWeight: '600' }}>{new Date(login.iso).toLocaleString('pt-BR', { weekday: 'long' })}</Text>) : null}</View><Feather name={idx === 0 ? 'check-circle' : 'clock'} size={15} color={idx === 0 ? T.green : T.textMuted} /></View>))}</View>)}<View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginVertical: 4 }}><View style={{ flex: 1, height: 1, backgroundColor: T.border }} /><Text style={{ fontSize: 10 * fontScale, fontWeight: '800', color: T.textMuted, textTransform: 'uppercase', letterSpacing: 1 }}>Eventos do Sistema</Text><View style={{ flex: 1, height: 1, backgroundColor: T.border }} /></View>{(!auditLogs.logs || auditLogs.logs.length === 0) ? (<View style={{ alignItems: 'center', paddingVertical: 32 }}><Feather name="check-circle" size={36} color={T.green} /><Text style={{ textAlign: 'center', color: T.textSub, marginTop: 12, fontSize: 14 * fontScale, fontWeight: '700' }}>Nenhum evento nos últimos 3 dias.</Text></View>) : (auditLogs.logs.map((log, index) => { const isLogin = log.action?.includes('LOGIN') || log.action?.includes('QR'); const isWarning = log.action?.includes('FAILED') || log.action?.includes('DENIED') || log.action?.includes('ERROR') || log.action?.includes('INVALID'); const iconName = isWarning ? 'alert-triangle' : isLogin ? 'log-in' : 'activity'; const iconColor = isWarning ? T.amber : isLogin ? T.blue : T.teal; const bgColor = isWarning ? T.amberGlow : isLogin ? T.blueGlow : T.tealGlow; const borderColor = isWarning ? T.amber + '40' : isLogin ? T.blue + '30' : T.teal + '30'; return (<View key={index} style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10, backgroundColor: T.bgElevated, borderRadius: 14, padding: 12, borderWidth: 1, borderColor: borderColor }}><View style={{ width: 30, height: 30, borderRadius: 9, backgroundColor: bgColor, justifyContent: 'center', alignItems: 'center', marginTop: 1, borderWidth: 1, borderColor: borderColor }}><Feather name={iconName} size={13} color={iconColor} /></View><View style={{ flex: 1 }}><View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}><Text style={{ fontSize: 12 * fontScale, fontWeight: '900', color: iconColor, flex: 1, paddingRight: 8 }}>{log.action}</Text><Text style={{ fontSize: 9 * fontScale, color: T.textMuted, fontWeight: '700', flexShrink: 0 }}>{new Date(log.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</Text></View><Text style={{ fontSize: 11 * fontScale, color: T.textSub, marginTop: 3, lineHeight: 16 }}>{log.details}</Text><Text style={{ fontSize: 9 * fontScale, color: T.textMuted, marginTop: 4, fontWeight: '600' }}>{new Date(log.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}{log.userId ? `  ·  ID ${log.userId}` : ''}</Text></View></View>); }))}</ScrollView></View></View></Modal>
-      {!scanning && (<View style={{ paddingTop: 50, paddingHorizontal: 20, paddingBottom: 16, backgroundColor: T.bg, borderBottomWidth: 1, borderColor: T.border }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>{userData?.PERFILFOTOURL ? <Image source={{ uri: userData.PERFILFOTOURL }} style={{ width: 52, height: 52, borderRadius: 26, borderWidth: 2, borderColor: T.blue }} /> : <View style={{ width: 52, height: 52, borderRadius: 18, backgroundColor: T.blue, justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: T.blue, shadowOpacity: 0.3, shadowRadius: 10 }}><Text style={{ color: '#FFF', fontSize: 18, fontWeight: '900' }}>{initials}</Text></View>}<View style={{ flex: 1, paddingRight: 12 }}><Text style={{ fontWeight: '900', color: T.text, fontSize: 20 * fontScale, letterSpacing: -0.5 }} numberOfLines={1}>{userData?.NOME || 'Usuário'}</Text><Text style={{ color: T.textSub, fontSize: 12.5 * fontScale, fontWeight: '700', marginTop: 2 }} numberOfLines={1}>Painel de estoque inteligente</Text></View><View style={{ flexDirection: 'row', gap: 10 }}>{(canSw || isDeposito(perf)) && (<TouchableOpacity style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border, justifyContent: 'center', alignItems: 'center' }} onPress={() => setShelfModal(true)}><Feather name="layers" size={18} color={T.blue} /></TouchableOpacity>)}<TouchableOpacity style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border, justifyContent: 'center', alignItems: 'center' }} onPress={() => { addAuditLog('LOGOUT', 'Usuário fez logout', userData?.id); oneSignalLogout(); setIsLogged(false); setUserData(null); setEmailIn(''); setPassIn(''); setStockData([]); setActiveShelf(''); setCadastroShelf(''); setCleanToast(null); setFailedAttempts(0); setLockedOut(false); if (lockoutTimerRef.current) clearInterval(lockoutTimerRef.current); }}><Feather name="log-out" size={18} color={T.red} /></TouchableOpacity></View></View></View>)}
+      {!scanning && (
+        <View style={{ paddingTop: 50, paddingHorizontal: 20, paddingBottom: 18, backgroundColor: T.bg }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+            <View style={{ width: 56, height: 56, borderRadius: 20, padding: 2, backgroundColor: T.blueGlow }}>
+              {userData?.PERFILFOTOURL ? (
+                <Image source={{ uri: userData.PERFILFOTOURL }} style={{ width: '100%', height: '100%', borderRadius: 18 }} />
+              ) : (
+                <View style={{ width: '100%', height: '100%', borderRadius: 18, backgroundColor: T.blue, justifyContent: 'center', alignItems: 'center' }}>
+                  <Text style={{ color: '#FFF', fontSize: 17, fontWeight: '900' }}>{initials}</Text>
+                </View>
+              )}
+              <View style={{ position: 'absolute', bottom: -1, right: -1, width: 15, height: 15, borderRadius: 8, backgroundColor: T.green, borderWidth: 2, borderColor: T.bg }} />
+            </View>
+            <View style={{ flex: 1, paddingRight: 12 }}>
+              <Text style={{ fontWeight: '900', color: T.text, fontSize: 19 * fontScale, letterSpacing: -0.4 }} numberOfLines={1}>{userData?.NOME || 'Usuário'}</Text>
+              <Text style={{ color: T.textSub, fontSize: 12 * fontScale, fontWeight: '700', marginTop: 2 }} numberOfLines={1}>Painel de estoque inteligente</Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              {(canSw || isDeposito(perf)) && (<TouchableOpacity style={{ width: 40, height: 40, borderRadius: 14, backgroundColor: T.blueGlow, justifyContent: 'center', alignItems: 'center' }} onPress={() => setShelfModal(true)}><Feather name="layers" size={17} color={T.blue} /></TouchableOpacity>)}
+              <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 14, backgroundColor: T.redGlow, justifyContent: 'center', alignItems: 'center' }} onPress={() => { addAuditLog('LOGOUT', 'Usuário fez logout', userData?.id); oneSignalLogout(); setIsLogged(false); setUserData(null); setEmailIn(''); setPassIn(''); setStockData([]); setActiveShelf(''); setCadastroShelf(''); setCleanToast(null); setFailedAttempts(0); setLockedOut(false); if (lockoutTimerRef.current) clearInterval(lockoutTimerRef.current); }}><Feather name="log-out" size={17} color={T.red} /></TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
       <Animated.View style={{ flex: 1, opacity: fadeAnim }}>
         {currentTab === 'home' && !scanning && (
           <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: TAB_SAFE + 20 }} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-            <View style={{ flexDirection: 'row', gap: 12, marginBottom: 20 }}><View style={{ flex: 1.4, backgroundColor: T.bgCard, borderRadius: 22, padding: 20, borderWidth: 1, borderColor: T.border }}><Text style={{ color: T.textSub, fontSize: 13 * fontScale, fontWeight: '700', marginBottom: 10, textTransform: 'uppercase' }}>Itens Ativos</Text><Text style={{ color: T.text, fontSize: 42 * fontScale, fontWeight: '900', letterSpacing: -1.5 }}>{stockData.length}</Text><Text style={{ color: shPal.accent, fontSize: 14 * fontScale, fontWeight: '800', marginTop: 6 }}>{shlabel(activeShelf)}</Text><Text style={{ color: T.textSub, fontSize: 11.5 * fontScale, fontWeight: '700', marginTop: 8 }}>Toque em Estoque para ver todos.</Text></View><View style={{ flex: 1, gap: 12 }}><TouchableOpacity style={{ flex: 1, borderRadius: 16, padding: 16, justifyContent: 'center', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: T.blue + '30', backgroundColor: T.blueGlow }} onPress={() => navTo('estoque')}><Feather name="layers" size={20} color={T.blue} /><Text style={{ fontWeight: '800', fontSize: 13 * fontScale, color: T.blue }}>Estoque</Text></TouchableOpacity><TouchableOpacity style={{ flex: 1, borderRadius: 16, padding: 16, justifyContent: 'center', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: T.teal + '30', backgroundColor: T.tealGlow }} onPress={() => navTo('chat')}><Feather name="message-circle" size={20} color={T.teal} /><Text style={{ fontWeight: '800', fontSize: 13 * fontScale, color: T.teal }}>IA Chat</Text></TouchableOpacity></View></View>
+            {/* ── Hero card redesenhado: bloco único com selo de prateleira no canto ── */}
+            <View style={{ backgroundColor: T.bgCard, borderRadius: 26, padding: 22, marginBottom: 18, borderWidth: 1, borderColor: T.border, shadowColor: T.accent, shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.07, shadowRadius: 22, elevation: 4 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <View>
+                  <Text style={{ color: T.textSub, fontSize: 12 * fontScale, fontWeight: '800', letterSpacing: 0.8, textTransform: 'uppercase' }}>Itens ativos</Text>
+                  <Text style={{ color: T.text, fontSize: 46 * fontScale, fontWeight: '900', letterSpacing: -2, marginTop: 4 }}>{stockData.length}</Text>
+                </View>
+                <View style={{ backgroundColor: shPal.glow, paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14, borderWidth: 1, borderColor: shPal.accent + '40', flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Feather name={shPal.icon} size={12} color={shPal.accent} />
+                  <Text style={{ color: shPal.accent, fontSize: 12 * fontScale, fontWeight: '800' }}>{shlabel(activeShelf)}</Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row', gap: 10, marginTop: 18 }}>
+                <TouchableOpacity style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderRadius: 15, paddingVertical: 13, borderWidth: 1, borderColor: T.blue + '35', backgroundColor: T.blueGlow }} onPress={() => navTo('estoque')}>
+                  <Feather name="layers" size={16} color={T.blue} /><Text style={{ fontWeight: '800', fontSize: 13 * fontScale, color: T.blue }}>Ver Estoque</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, borderRadius: 15, paddingVertical: 13, borderWidth: 1, borderColor: T.teal + '35', backgroundColor: T.tealGlow }} onPress={() => navTo('chat')}>
+                  <Feather name="message-circle" size={16} color={T.teal} /><Text style={{ fontWeight: '800', fontSize: 13 * fontScale, color: T.teal }}>Falar com IA</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
             <ShelfQuickSelector current={cadastroShelf || activeShelf} onOpen={isRepositor(perf) ? undefined : () => setShelfModal(true)} T={T} fontScale={fontScale} title={canSw || isDeposito(perf) ? 'Troca rápida de prateleira' : 'Sua prateleira ativa'} subtitle={isRepositor(perf) ? 'Sua prateleira é definida pelo coordenador.' : canSw || isDeposito(perf) ? 'Toque para trocar a prateleira' : 'Visualize a prateleira atual.'} />
             {counts.expired > 0 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 16, borderWidth: 1, padding: 16, marginBottom: 12, gap: 12, borderColor: T.red + '50', backgroundColor: T.redGlow }} onPress={() => { setActiveFilter('expired'); navTo('estoque'); }}><Feather name="alert-circle" size={20} color={T.red} /><View style={{ flex: 1 }}><Text style={{ fontSize: 14 * fontScale, fontWeight: '800', color: T.red }}>{counts.expired} produto{counts.expired !== 1 ? 's' : ''} vencido{counts.expired !== 1 ? 's' : ''}!</Text><Text style={{ fontSize: 12 * fontScale, color: T.red, opacity: 0.8, marginTop: 2 }}>Toque para ver e gerenciar</Text></View><Feather name="arrow-right" size={16} color={T.red} /></TouchableOpacity>}
             {counts.warning > 0 && <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', borderRadius: 16, borderWidth: 1, padding: 16, marginBottom: 12, gap: 12, borderColor: T.amber + '50', backgroundColor: T.amberGlow }} onPress={() => { setActiveFilter('warning'); navTo('estoque'); }}><Feather name="alert-triangle" size={20} color={T.amber} /><View style={{ flex: 1 }}><Text style={{ fontSize: 14 * fontScale, fontWeight: '800', color: T.amber }}>{counts.warning} produto{counts.warning !== 1 ? 's' : ''} vence{counts.warning !== 1 ? 'm' : ''} em 7 dias</Text><Text style={{ fontSize: 12 * fontScale, color: T.amber, opacity: 0.8, marginTop: 2 }}>Atenção imediata necessária</Text></View><Feather name="arrow-right" size={16} color={T.amber} /></TouchableOpacity>}
@@ -11064,36 +12061,28 @@ export default function App() {
             <ActionCard T={T} fontScale={fontScale} icon="camera" color={T.purple} title="Scanner IA Vision" desc="Identifique produtos via foto" onPress={() => startScan('aiVision')} />
             <ActionCard T={T} fontScale={fontScale} icon="box" color={T.teal} title="🏗️ Calculadora de Pinhas" desc="Simule e calcule pilhas de produtos visualmente" onPress={() => setShowPinhasModal(true)} />
             <ActionCard T={T} fontScale={fontScale} icon="settings" color={T.textSub} title="Configurações do App" desc="Aparência, fonte e automações" onPress={() => navTo('config')} />
-            {/* Botão de microfone na home */}
-            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: T.blueGlow, borderRadius: 50, padding: 12, marginTop: 10, borderWidth: 1, borderColor: T.blue }} onPress={() => setVoiceAssistantVisible(true)}>
-              <Feather name="mic" size={24} color={T.blue} />
-              <Text style={{ marginLeft: 8, fontSize: 14 * fontScale, fontWeight: '700', color: T.blue }}>Assistente de Voz</Text>
-            </TouchableOpacity>
-            {/* Botão Novidades IA */}
-            <TouchableOpacity
-              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: T.purpleGlow, borderRadius: 50, padding: 12, marginTop: 10,
-                borderWidth: 1, borderColor: T.purple }}
-              onPress={() => { setJarvisInitialTab('novidades'); setShowPainelInteligente(true); }}>
-              <MaterialCommunityIcons name="robot-excited-outline" size={24} color={T.purple} />
-              <Text style={{ marginLeft: 8, fontSize: 14 * fontScale, fontWeight: '700', color: T.purple }}>
-                🤖 Novidades do Estoque
-              </Text>
-            </TouchableOpacity>
-            {/* Botão Painel Inteligente IA */}
-            <TouchableOpacity
-              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: T.tealGlow || '#0D2E2E', borderRadius: 50, padding: 12, marginTop: 10,
-                borderWidth: 1.5, borderColor: T.teal }}
-              onPress={() => { setJarvisInitialTab('painel'); setShowPainelInteligente(true); }}>
-              <MaterialCommunityIcons name="brain" size={24} color={T.teal} />
-              <Text style={{ marginLeft: 8, fontSize: 14 * fontScale, fontWeight: '800', color: T.teal }}>
-                🧠 Painel Inteligente
-              </Text>
-              {detectFifoGroups(stockData).hasFifo && (
-                <View style={{ marginLeft: 6, width: 8, height: 8, borderRadius: 4, backgroundColor: T.teal }} />
-              )}
-            </TouchableOpacity>
+            {/* ── Grupo de atalhos IA — unificado em um único bloco coeso ── */}
+            <View style={{ backgroundColor: T.bgCard, borderRadius: 22, borderWidth: 1, borderColor: T.border, marginTop: 6, overflow: 'hidden' }}>
+              <View style={{ paddingHorizontal: 18, paddingTop: 16, paddingBottom: 10 }}>
+                <Text style={{ fontSize: 11 * fontScale, fontWeight: '900', color: T.textMuted, letterSpacing: 1, textTransform: 'uppercase' }}>Atalhos de Inteligência Artificial</Text>
+              </View>
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, paddingVertical: 14, gap: 12, borderTopWidth: 1, borderColor: T.border }} onPress={() => setVoiceAssistantVisible(true)}>
+                <View style={{ width: 38, height: 38, borderRadius: 13, backgroundColor: T.blueGlow, justifyContent: 'center', alignItems: 'center' }}><Feather name="mic" size={18} color={T.blue} /></View>
+                <Text style={{ flex: 1, fontSize: 14 * fontScale, fontWeight: '800', color: T.text }}>Assistente de Voz</Text>
+                <Feather name="chevron-right" size={16} color={T.textMuted} />
+              </TouchableOpacity>
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, paddingVertical: 14, gap: 12, borderTopWidth: 1, borderColor: T.border }} onPress={() => { setJarvisInitialTab('novidades'); setShowPainelInteligente(true); }}>
+                <View style={{ width: 38, height: 38, borderRadius: 13, backgroundColor: T.purpleGlow, justifyContent: 'center', alignItems: 'center' }}><MaterialCommunityIcons name="robot-excited-outline" size={19} color={T.purple} /></View>
+                <Text style={{ flex: 1, fontSize: 14 * fontScale, fontWeight: '800', color: T.text }}>Novidades do Estoque</Text>
+                <Feather name="chevron-right" size={16} color={T.textMuted} />
+              </TouchableOpacity>
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, paddingVertical: 14, gap: 12, borderTopWidth: 1, borderColor: T.border }} onPress={() => { setJarvisInitialTab('painel'); setShowPainelInteligente(true); }}>
+                <View style={{ width: 38, height: 38, borderRadius: 13, backgroundColor: T.tealGlow, justifyContent: 'center', alignItems: 'center' }}><MaterialCommunityIcons name="brain" size={19} color={T.teal} /></View>
+                <Text style={{ flex: 1, fontSize: 14 * fontScale, fontWeight: '800', color: T.text }}>Painel Inteligente</Text>
+                {detectFifoGroups(stockData).hasFifo && (<View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: T.teal, marginRight: 4 }} />)}
+                <Feather name="chevron-right" size={16} color={T.textMuted} />
+              </TouchableOpacity>
+            </View>
           </ScrollView>
         )}
         {currentTab === 'chat' && <ChatScreen T={T} fontScale={fontScale} msgs={msgs} chatTxt={chatTxt} setChatTxt={setChatTxt} sendChat={sendChat} sendChatVoice={sendChatVoice} busy={chatBusy} scrollRef={scrollRef} TAB_H={TAB_H} NAV_BAR_H={NAV_BAR_H} onVoiceMode={setJarvisVoiceMode} jarvisRecording={jarvisRecording} jarvisProcessing={jarvisProcessing} jarvisBusy={chatBusy} onProgressDone={closeJarvisProgress} activeShelf={activeShelf} pinnedShelf={pinnedShelf} setPinnedShelf={setPinnedShelf} shlabel={shlabel} SHELF_KEYS={SHELF_KEYS} SHELVES={SHELVES} onUiAction={onChatUiAction} />}
@@ -11133,19 +12122,35 @@ export default function App() {
                 </View>
               </View>
             )}
-            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderColor: T.border, gap: 8, backgroundColor: T.bgCard }}>
-              <FlatList horizontal showsHorizontalScrollIndicator={false} data={FILTERS} keyExtractor={f => f.key} style={{ flex: 1 }} contentContainerStyle={{ gap: 8 }} renderItem={({ item: f }) => { const on = activeFilter === f.key; const fc2 = fcol[f.colorKey]; const cnt = counts[f.key]; return (<TouchableOpacity style={[{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 9, borderRadius: 12, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border }, on && { backgroundColor: fc2 + '18', borderColor: fc2 + '60' }]} onPress={() => setActiveFilter(f.key)}><Feather name={f.icon} size={13} color={on ? fc2 : T.textSub} /><Text style={[{ fontSize: 13 * fontScale, fontWeight: '700', color: T.textSub }, on && { color: fc2, fontWeight: '800' }]}>{f.label}</Text>{cnt > 0 && <View style={{ width: 18, height: 18, borderRadius: 9, justifyContent: 'center', alignItems: 'center', backgroundColor: on ? fc2 : T.borderMid }}><Text style={{ fontSize: 10, fontWeight: '900', color: on ? '#FFF' : T.textSub }}>{cnt}</Text></View>}</TouchableOpacity>); }} />
-              <View style={{ flexDirection: 'row', gap: 6, marginLeft: 8 }}><TouchableOpacity style={[{ width: 36, height: 36, borderRadius: 10, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border, justifyContent: 'center', alignItems: 'center' }, searchOpen && { backgroundColor: T.blueGlow, borderColor: T.blue + '60' }]} onPress={() => { setSearchOpen(o => !o); if (searchOpen) setSearchQuery(''); }}><Feather name="search" size={16} color={searchOpen ? T.blue : T.textSub} /></TouchableOpacity>{['list', 'grid'].map(m => (<TouchableOpacity key={m} style={[{ width: 36, height: 36, borderRadius: 10, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border, justifyContent: 'center', alignItems: 'center' }, viewMode === m && { backgroundColor: T.blueGlow, borderColor: T.blue + '60' }]} onPress={() => setViewMode(m)}><Feather name={m} size={16} color={viewMode === m ? T.blue : T.textSub} /></TouchableOpacity>))}</View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, gap: 8, backgroundColor: T.bgCard, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 }}>
+              <FlatList horizontal showsHorizontalScrollIndicator={false} data={FILTERS} keyExtractor={f => f.key} style={{ flex: 1 }} contentContainerStyle={{ gap: 8 }} renderItem={({ item: f }) => { const on = activeFilter === f.key; const fc2 = fcol[f.colorKey]; const cnt = counts[f.key]; return (<TouchableOpacity style={[{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 15, paddingVertical: 10, borderRadius: 22, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border }, on && { backgroundColor: fc2, borderColor: fc2 }]} onPress={() => setActiveFilter(f.key)}><Feather name={f.icon} size={13} color={on ? '#FFF' : T.textSub} /><Text style={[{ fontSize: 13 * fontScale, fontWeight: '700', color: T.textSub }, on && { color: '#FFF', fontWeight: '800' }]}>{f.label}</Text>{cnt > 0 && <View style={{ minWidth: 18, height: 18, paddingHorizontal: 3, borderRadius: 9, justifyContent: 'center', alignItems: 'center', backgroundColor: on ? 'rgba(255,255,255,0.3)' : T.borderMid }}><Text style={{ fontSize: 10, fontWeight: '900', color: on ? '#FFF' : T.textSub }}>{cnt}</Text></View>}</TouchableOpacity>); }} />
+              <View style={{ flexDirection: 'row', gap: 6, marginLeft: 8 }}><TouchableOpacity style={[{ width: 38, height: 38, borderRadius: 13, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border, justifyContent: 'center', alignItems: 'center' }, searchOpen && { backgroundColor: T.blue, borderColor: T.blue }]} onPress={() => { setSearchOpen(o => !o); if (searchOpen) setSearchQuery(''); }}><Feather name="search" size={16} color={searchOpen ? '#FFF' : T.textSub} /></TouchableOpacity>{['list', 'grid'].map(m => (<TouchableOpacity key={m} style={[{ width: 38, height: 38, borderRadius: 13, backgroundColor: T.bgInput, borderWidth: 1, borderColor: T.border, justifyContent: 'center', alignItems: 'center' }, viewMode === m && { backgroundColor: T.blue, borderColor: T.blue }]} onPress={() => setViewMode(m)}><Feather name={m} size={16} color={viewMode === m ? '#FFF' : T.textSub} /></TouchableOpacity>))}</View>
             </View>
-            {searchOpen && (<View style={{ paddingHorizontal: 16, paddingVertical: 10, backgroundColor: T.bgCard, borderBottomWidth: 1, borderColor: T.border }}><View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderRadius: 14, borderWidth: 1.5, borderColor: T.blue + '60', paddingHorizontal: 14, gap: 10 }}><Feather name="search" size={16} color={T.blue} /><TextInput style={{ flex: 1, paddingVertical: 12, fontSize: 15 * fontScale, color: T.text }} placeholder="Buscar produto pelo nome..." placeholderTextColor={T.textMuted} value={searchQuery} onChangeText={setSearchQuery} autoFocus clearButtonMode="while-editing" />{searchQuery.length > 0 && (<TouchableOpacity onPress={() => setSearchQuery('')}><Feather name="x" size={16} color={T.textMuted} /></TouchableOpacity>)}</View></View>)}
+            {searchOpen && (<View style={{ paddingHorizontal: 16, paddingVertical: 10, backgroundColor: T.bgCard, borderBottomWidth: 1, borderColor: T.border }}><View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: T.bgInput, borderRadius: 16, borderWidth: 1.5, borderColor: T.blue + '60', paddingHorizontal: 14, gap: 10 }}><Feather name="search" size={16} color={T.blue} /><TextInput style={{ flex: 1, paddingVertical: 12, fontSize: 15 * fontScale, color: T.text }} placeholder="Buscar produto pelo nome..." placeholderTextColor={T.textMuted} value={searchQuery} onChangeText={setSearchQuery} autoFocus clearButtonMode="while-editing" />{searchQuery.length > 0 && (<TouchableOpacity onPress={() => setSearchQuery('')}><Feather name="x" size={16} color={T.textMuted} /></TouchableOpacity>)}</View></View>)}
             <FlatList key={viewMode} data={filteredStock} keyExtractor={(item, index) => `${item.id}-${index}`} numColumns={viewMode === 'grid' ? 2 : 1} columnWrapperStyle={viewMode === 'grid' ? { gap: 12 } : undefined} renderItem={({ item }) => viewMode === 'list' ? <CardList item={item} T={T} fontScale={fontScale} onPress={setSelectedProduct} fifoMode={fifoMode} allProducts={stockData} /> : <CardGrid item={item} T={T} fontScale={fontScale} onPress={setSelectedProduct} fifoMode={fifoMode} allProducts={stockData} />} contentContainerStyle={{ padding: 16, paddingBottom: TAB_SAFE + 24 }} showsVerticalScrollIndicator={false} ListEmptyComponent={() => (<View style={{ alignItems: 'center', paddingVertical: 80 }}><Feather name={searchQuery ? 'search' : 'inbox'} size={60} color={T.textMuted} /><Text style={{ color: T.textSub, marginTop: 20, fontSize: 17 * fontScale, fontWeight: '800', textAlign: 'center' }}>{searchQuery ? 'Nenhum resultado' : 'Nada aqui...'}</Text><Text style={{ color: T.textMuted, marginTop: 8, fontSize: 14 * fontScale, fontWeight: '600', textAlign: 'center' }}>{searchQuery ? `Nenhum produto encontrado para "${searchQuery}".` : activeFilter === 'all' ? 'Nenhum produto cadastrado nesta prateleira.' : 'Nenhum produto atende a este filtro.'}</Text></View>)} />
           </View>
         )}
         {currentTab === 'config' && <ConfigScreen T={T} currentTheme={currentTheme} onThemeChange={setCurrentTheme} fontScale={fontScale} setFontScale={setFontScale} notifOn={notifOn} setNotifOn={setNotifOn} TAB_SAFE={TAB_SAFE} onGenerateQR={() => setShowQrGenerator(true)} onViewAuditLogs={viewAuditLogs} onEnableBiometrics={enableBiometrics} biometricEnabled={biometricEnabled} onChangePassword={handleChangePassword} userData={userData} fifoMode={fifoMode} setFifoMode={setFifoMode} micSoundEnabled={micSoundEnabled} setMicSoundEnabled={updateMicSound} micVibrationEnabled={micVibrationEnabled} setMicVibrationEnabled={updateMicVibration} micSoundVolume={micSoundVolume} setMicSoundVolume={updateMicVolume} voiceRecognitionEnabled={voiceRecognitionEnabled} setVoiceRecognitionEnabled={updateVoiceRecognition} elevenLabsQuota={elevenLabsQuota} onFetchQuota={async () => { const quota = await fetchElevenLabsQuota(); setElevenLabsQuota(quota); if (!quota) AppAlert.alert('Erro', 'Não foi possível buscar as cotas do ElevenLabs.'); }} />}
       </Animated.View>
-      <Modal visible={scanning} animationType='fade' transparent={false} onRequestClose={() => setScanning(false)}><View style={StyleSheet.absoluteFill}>          <CameraView ref={camRef} style={StyleSheet.absoluteFill} enableTorch={torchOn} onBarcodeScanned={scanMode === 'barcode' ? onBarcode : undefined} barcodeScannerSettings={{ barcodeTypes: ['ean13', 'upc_a', 'ean8', 'qr', 'code128'] }} onCameraReady={scanMode === 'aiVision' ? onAIVisionCameraReady : undefined} />
-          <DarkTorchPrompt isDarkEnv={isDarkEnv} lightLevel={lightLevel} torchOn={torchOn} onToggleTorch={() => setTorchOn(p => !p)} T={T} fontScale={fontScale} /><View style={{ ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.32)' }}><View style={{ position: 'absolute', top: 40, left: 0, right: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24 }}><TouchableOpacity style={{ width: 46, height: 46, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.6)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' }} onPress={() => { setScanning(false); setCountdown(null); setTorchOn(false); setShowAchandoGif(false); aiVisionTriggeredRef.current = false; if (gifTimeoutRef.current) clearTimeout(gifTimeoutRef.current); }}><Feather name="x" size={22} color="#FFF" /></TouchableOpacity><TouchableOpacity style={{ width: 46, height: 46, borderRadius: 14, backgroundColor: torchOn ? 'rgba(255,255,255,0.9)' : 'rgba(0,0,0,0.6)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' }} onPress={() => setTorchOn(!torchOn)}><Feather name="zap" size={20} color={torchOn ? '#000' : '#FFF'} /></TouchableOpacity></View>{scanMode === 'barcode' && !showAchandoGif && (<View style={{ alignItems: 'center' }}><View style={{ width: 280, height: 180, borderWidth: 2, borderColor: T.blue, borderRadius: 24, backgroundColor: 'rgba(59,91,255,0.05)' }}><Animated.View style={{ height: 2, backgroundColor: T.blue, width: '100%', position: 'absolute', top: scanAnim.interpolate({ inputRange: [0, 1], outputRange: ['10%', '90%'] }), shadowColor: T.blue, shadowOpacity: 1, shadowRadius: 10, elevation: 10 }} /></View><Text style={{ color: '#FFF', marginTop: 24, fontWeight: '800', fontSize: 16, textShadowColor: 'rgba(0,0,0,0.8)', textShadowRadius: 4 }}>Posicione o código de barras</Text><Text style={{ color: 'rgba(255,255,255,0.6)', marginTop: 8, fontWeight: '600', fontSize: 13, textAlign: 'center', paddingHorizontal: 40 }}>Nome preenchido automaticamente pela IA</Text></View>)}{scanMode === 'aiVision' && (<View style={{ alignItems: 'center' }}><Animated.View style={{ width: 260, height: 260, borderWidth: 3, borderColor: T.purple, borderRadius: 130, backgroundColor: 'rgba(124,58,237,0.1)', alignItems: 'center', justifyContent: 'center', transform: [{ scale: pulseAnim }] }}><MaterialCommunityIcons name="robot-outline" size={80} color={T.purple} /></Animated.View><Text style={{ color: '#FFF', marginTop: 32, fontWeight: '800', fontSize: 18, textAlign: 'center', paddingHorizontal: 40 }}>IA Vision · Aponte para o produto</Text><Text style={{ color: 'rgba(255,255,255,0.65)', marginTop: 8, fontWeight: '600', fontSize: 13, textAlign: 'center', paddingHorizontal: 40 }}>Captura automática em tempo real pelo Gemini</Text></View>)}</View></View></Modal>
-      {showAchandoGif && (<View style={StyleSheet.absoluteFill}><View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center' }}><View style={{ backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 30, padding: 25, borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)' }}><Image source={AchandoGif} style={{ width: 180, height: 180 }} resizeMode="contain" /></View><Text style={{ marginTop: 35, color: '#FFF', fontSize: 22, fontWeight: 'bold', letterSpacing: 1 }}>Consultando fontes...</Text><Text style={{ marginTop: 10, color: 'rgba(255,255,255,0.7)', fontSize: 14 }}>Buscando em GEI.IA, Bluesoft e OpenFoodFacts</Text></View></View>)}
+      {/* ══════════════════════════════════════════════════════════════
+           SCANNER PREMIUM — Barcode + AI Vision + Animações
+      ══════════════════════════════════════════════════════════════ */}
+      <ScannerModalPremium
+        visible={scanning}
+        scanMode={scanMode}
+        camRef={camRef}
+        torchOn={torchOn}
+        setTorchOn={setTorchOn}
+        onBarcode={onBarcode}
+        onClose={() => { setScanning(false); setCountdown(null); setTorchOn(false); setShowAchandoGif(false); aiVisionTriggeredRef.current = false; if (gifTimeoutRef.current) clearTimeout(gifTimeoutRef.current); }}
+        onAIVisionCameraReady={onAIVisionCameraReady}
+        showAchandoGif={showAchandoGif}
+        T={T}
+        isDarkEnv={isDarkEnv}
+        fontScale={fontScale}
+        scanAnim={scanAnim}
+        pulseAnim={pulseAnim}
+      />
       {/* PATCH: Modal "IA pensando" — digita prompts inteligentes ao vivo */}
       <Modal visible={smartCadastro.visible} transparent animationType="fade" statusBarTranslucent onRequestClose={() => setSmartCadastro(s => ({ ...s, visible: false }))}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.78)', justifyContent: 'center', alignItems: 'center', padding: 18 }}>
@@ -11191,8 +12196,27 @@ export default function App() {
         </View>
       </Modal>
 
-      <Modal visible={showRoboGif} transparent animationType="fade" statusBarTranslucent onRequestClose={() => {}}><View style={{ flex: 1, backgroundColor: 'rgba(0,10,40,0.92)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }}><View style={{ backgroundColor: '#FFFFFF', borderRadius: 36, padding: 28, width: '90%', alignItems: 'center', shadowColor: '#3B5BFF', shadowOpacity: 0.5, shadowRadius: 40, elevation: 20, borderWidth: 2, borderColor: 'rgba(59,91,255,0.25)' }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(59,91,255,0.1)', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, marginBottom: 16, borderWidth: 1, borderColor: 'rgba(59,91,255,0.25)' }}><View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#3B5BFF' }} /><Text style={{ fontSize: 11, fontWeight: '900', color: '#3B5BFF', letterSpacing: 1.5, textTransform: 'uppercase' }}>IA Vision · GEI.AI</Text></View><View style={{ width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(59,91,255,0.06)', borderWidth: 3, borderColor: 'rgba(59,91,255,0.3)', justifyContent: 'center', alignItems: 'center', marginBottom: 20, shadowColor: '#3B5BFF', shadowOpacity: 0.3, shadowRadius: 20, elevation: 8 }}><Image source={RoboGif} style={{ width: 170, height: 170, borderRadius: 85 }} resizeMode="cover" fadeDuration={0} /></View><View style={{ width: '80%', height: 1, backgroundColor: 'rgba(59,91,255,0.12)', marginBottom: 16 }} /><Text style={{ fontSize: 13, fontWeight: '800', color: '#3B5BFF', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 }}>Produto Identificado!</Text><Text style={{ fontSize: 16, fontWeight: '900', color: '#0F172A', textAlign: 'center', lineHeight: 22, paddingHorizontal: 8 }} numberOfLines={3}>{roboMsg.split('\n')[1]}</Text><View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 18, backgroundColor: 'rgba(22,163,74,0.08)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, borderWidth: 1, borderColor: 'rgba(22,163,74,0.25)' }}><Feather name="check-circle" size={14} color="#16A34A" /><Text style={{ fontSize: 12, fontWeight: '800', color: '#16A34A' }}>Cadastro sendo aberto...</Text></View></View></View></Modal>
-      {!scanning && (<View style={{ height: TAB_SAFE, backgroundColor: T.bgCard, borderTopWidth: 1, borderColor: T.border, flexDirection: 'row', paddingBottom: NAV_BAR_H, paddingHorizontal: 10 }}><TabBtn icon="home" label="Início" active={currentTab === 'home'} onPress={() => navTo('home')} T={T} fontScale={fontScale} /><TabBtn icon="layers" label="Estoque" active={currentTab === 'estoque'} onPress={() => navTo('estoque')} T={T} fontScale={fontScale} /><View style={{ flex: 1.2, alignItems: 'center', justifyContent: 'center' }}><TouchableOpacity activeOpacity={0.9} style={{ width: 58, height: 58, borderRadius: 22, backgroundColor: T.blue, marginTop: -34, justifyContent: 'center', alignItems: 'center', elevation: 10, shadowColor: T.blue, shadowOpacity: 0.4, shadowRadius: 12, borderWidth: 4, borderColor: T.bgCard }} onPress={() => { resetWiz(); setProdName(''); setGiro(''); navTo('cadastro'); }}><Feather name="plus" size={28} color="#FFF" /></TouchableOpacity></View><TabBtn icon="message-circle" label="IA Chat" active={currentTab === 'chat'} onPress={() => navTo('chat')} T={T} fontScale={fontScale} /><TabBtn icon="settings" label="Ajustes" active={currentTab === 'config'} onPress={() => navTo('config')} T={T} fontScale={fontScale} /></View>)}
+      {/* ══════════════════════════════════════════════════════════════
+           IA Vision "Produto Identificado" — Modal Premium
+      ══════════════════════════════════════════════════════════════ */}
+      <Modal visible={showRoboGif} transparent animationType="fade" statusBarTranslucent onRequestClose={() => {}}>
+        <RoboGifPremium roboMsg={roboMsg} T={T} fontScale={fontScale} />
+      </Modal>
+      {!scanning && (
+        <View style={{ height: TAB_H, backgroundColor: T.bgCard, borderTopWidth: 1, borderColor: T.border, borderTopLeftRadius: 26, borderTopRightRadius: 26, flexDirection: 'row', paddingBottom: NAV_BAR_H, paddingHorizontal: 8, shadowColor: T.accent, shadowOffset: { width: 0, height: -6 }, shadowOpacity: 0.06, shadowRadius: 16, elevation: 8 }}>
+          <TabBtn icon="home" label="Início" active={currentTab === 'home'} onPress={() => navTo('home')} T={T} fontScale={fontScale} />
+          <TabBtn icon="layers" label="Estoque" active={currentTab === 'estoque'} onPress={() => navTo('estoque')} T={T} fontScale={fontScale} />
+          <View style={{ flex: 1.2, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 66, height: 66, borderRadius: 24, backgroundColor: T.bg, marginTop: -30, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: T.border }}>
+              <TouchableOpacity activeOpacity={0.9} style={{ width: 56, height: 56, borderRadius: 20, backgroundColor: T.blue, justifyContent: 'center', alignItems: 'center', shadowColor: T.blue, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 12, elevation: 10 }} onPress={() => { resetWiz(); setProdName(''); setGiro(''); navTo('cadastro'); }}>
+                <Feather name="plus" size={26} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <TabBtn icon="message-circle" label="IA Chat" active={currentTab === 'chat'} onPress={() => navTo('chat')} T={T} fontScale={fontScale} />
+          <TabBtn icon="settings" label="Ajustes" active={currentTab === 'config'} onPress={() => navTo('config')} T={T} fontScale={fontScale} />
+        </View>
+      )}
       {/* ── Botão flutuante JARVIS — qualquer tela ─────────────────────────── */}
       {!scanning && (
         <TouchableOpacity
@@ -11259,7 +12283,7 @@ export default function App() {
           </View>
         </View>
       </Modal>
-      {selectedProduct && (<ProductDetailModal visible={!!selectedProduct} product={selectedProduct} onClose={() => setSelectedProduct(null)} onDelete={deleteProduct} T={T} fontScale={fontScale} fifoMode={fifoMode} allProducts={stockData} />)}
+      {selectedProduct && (<ProductDetailModal visible={!!selectedProduct} product={selectedProduct} onClose={() => setSelectedProduct(null)} onDelete={deleteProduct} onUpdateQuantity={updateProductQuantity} T={T} fontScale={fontScale} fifoMode={fifoMode} allProducts={stockData} />)}
       {/* Not Found Modal */}
       <Modal visible={notFoundModal.visible} transparent animationType="fade" onRequestClose={() => setNotFoundModal({ visible: false, ean: '' })}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.65)', justifyContent: 'center', padding: 24 }}>
