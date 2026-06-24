@@ -461,7 +461,7 @@ const TOKEN_API_URL = 'https://gei-ai-eta.vercel.app/api/estoque';
 const TOKEN_API_KEY = 'cordeirorequestloja3';
 let BASEROW_TOKEN = '';
 let RT_API_KEY_IA = 'AIzaSyDQ37jwNASoO_6eHZpvI4pQtD7Ix0OX8Qc'; // fallback key
-let RT_BLUESOFT_TOKEN = '';
+let RT_BLUESOFT_TOKEN = 'Py8pbK4V5YwLGB09ECMJrA'; // fallback token Bluesoft Cosmos
 let GROQ_API_KEY = '';
 let ELEVEN_LABS_API_KEY_SECONDARY = '';
 
@@ -516,12 +516,13 @@ let tokensCallbacks = [];
         if (response.status === 401) throw new Error('Acesso negado: chave da API inválida ou expirada.');
         if (!response.ok) throw new Error(`Erro HTTP ${response.status}: ${response.statusText}`);
         const data = await response.json();
-        if (!data.BASEROW_TOKEN || !data.API_KEY_IA || !data.BLUESOFT_TOKEN || !data.API_KEY_GROQ) {
+        if (!data.BASEROW_TOKEN || !data.API_KEY_IA || !data.API_KEY_GROQ) {
           throw new Error('Resposta da API não contém todos os tokens necessários.');
         }
         BASEROW_TOKEN = data.BASEROW_TOKEN;
         RT_API_KEY_IA = data.API_KEY_IA;
-        RT_BLUESOFT_TOKEN = data.BLUESOFT_TOKEN;
+        // Bluesoft: usa o do servidor se vier, senao mantém o fallback hardcoded
+        RT_BLUESOFT_TOKEN = data.BLUESOFT_TOKEN || RT_BLUESOFT_TOKEN || 'Py8pbK4V5YwLGB09ECMJrA';
         GROQ_API_KEY = data.API_KEY_GROQ;
         
         // Tenta buscar API secundária ElevenLabs do Baserow (Tabela 915031)
@@ -1145,18 +1146,23 @@ const fetchProductSourcesOptimized = async (ean) => {
     const cache = await getAICache();
     if (cache[cacheKey] && cache[cacheKey].expiresAt > Date.now()) return cache[cacheKey].data;
     try {
+      const bluToken = RT_BLUESOFT_TOKEN || 'Py8pbK4V5YwLGB09ECMJrA';
       const res = await fetchWithTimeout(`https://api.cosmos.bluesoft.com.br/gtins/${ean}.json`, {
-        headers: { 'X-Cosmos-Token': RT_BLUESOFT_TOKEN, 'Content-Type': 'application/json' }
-      }, 5000);
-      if (!res.ok) throw new Error('Bluesoft error');
+        headers: { 'X-Cosmos-Token': bluToken, 'Content-Type': 'application/json' }
+      }, 6000);
+      if (res.status === 401 || res.status === 403) throw new Error('Token Bluesoft invalido ou sem permissao');
+      if (res.status === 404) throw new Error('EAN nao encontrado na base Bluesoft');
+      if (!res.ok) throw new Error(`Bluesoft HTTP ${res.status}`);
       const d = await res.json();
-      const nome = ([d.description, d.brand?.name].filter(Boolean).join(' · ') + (d.net_weight ? ` (${d.net_weight}${d.net_weight_unit || 'g'})` : '')).toUpperCase();
-      const data = { status: 'success', source: 'bluesoft', sourceLabel: 'Bluesoft Cosmos', sourceIcon: 'database', nome: nome.trim(), giro: 'Médio giro', categoria: d.ncm?.description || '', confianca: 95 };
+      const nomeParts = [d.description, d.brand?.name].filter(Boolean);
+      const peso = d.net_weight ? ` (${d.net_weight}${d.net_weight_unit || 'g'})` : '';
+      const nome = (nomeParts.join(' · ') + peso).toUpperCase();
+      const data = { status: 'success', source: 'bluesoft', sourceLabel: 'Bluesoft Cosmos', sourceIcon: 'database', nome: nome.trim() || 'PRODUTO SEM NOME', giro: 'Médio giro', categoria: d.ncm?.description || d.category?.description || '', confianca: 95 };
       const newCache = await getAICache();
       newCache[cacheKey] = { data, expiresAt: Date.now() + CACHE_TTL_MS };
       await setAICache(newCache);
       return data;
-    } catch (e) { return { status: 'error', source: 'bluesoft', sourceLabel: 'Bluesoft Cosmos', error: e.message || 'Falha na consulta' }; }
+    } catch (e) { console.warn('[Bluesoft]', e.message); return { status: 'error', source: 'bluesoft', sourceLabel: 'Bluesoft Cosmos', error: e.message || 'Falha na consulta' }; }
   };
   const fetchOFFCached = async () => {
     const cacheKey = `off_${ean}`;
@@ -9591,429 +9597,697 @@ const JarvisCentralModal = ({
 };
 
 // ════════════════════════════════════════════════════════════════════════════
-//  SCANNER MODAL PREMIUM  ─  Substitui o <Modal visible={scanning}> antigo
+//  SCANNER MODAL PREMIUM  ─  v4.0 — Cinema-grade redesign
 // ════════════════════════════════════════════════════════════════════════════
-const BARCODE_VW = 300;
-const BARCODE_VH = 170;
-const AI_VW = 270;
-const CORNER_SZ = 28;
-const CORNER_TH = 3.5;
+const SCAN = {
+  BW: 300, BH: 165,   // barcode frame
+  AW: 268,            // AI Vision circle diameter
+  CS: 28, CT: 3,      // corner size / thickness
+};
 
-const ScanCorner = ({ position, color, glow }) => {
-  const pos = {};
-  if (position.includes('top'))    pos.top    = -2;
-  if (position.includes('bottom')) pos.bottom = -2;
-  if (position.includes('left'))   pos.left   = -2;
-  if (position.includes('right'))  pos.right  = -2;
-  const borders = {
-    topLeft:     { borderTopWidth: CORNER_TH, borderLeftWidth: CORNER_TH },
-    topRight:    { borderTopWidth: CORNER_TH, borderRightWidth: CORNER_TH },
-    bottomLeft:  { borderBottomWidth: CORNER_TH, borderLeftWidth: CORNER_TH },
-    bottomRight: { borderBottomWidth: CORNER_TH, borderRightWidth: CORNER_TH },
+// ─── Paleta ────────────────────────────────────────────────────────────────
+const NEON_BLUE   = '#3B82F6';
+const NEON_CYAN   = '#06B6D4';
+const NEON_PURPLE = '#8B5CF6';
+const NEON_VIOLET = '#7C3AED';
+
+// ─── Canto angulado do viewfinder ─────────────────────────────────────────
+const VCorner = ({ pos, color }) => {
+  const base = { position:'absolute', width: SCAN.CS, height: SCAN.CS };
+  const bw   = SCAN.CT;
+  const styles = {
+    TL: { top:-1, left:-1,   borderTopWidth:bw, borderLeftWidth:bw,   borderTopLeftRadius:6 },
+    TR: { top:-1, right:-1,  borderTopWidth:bw, borderRightWidth:bw,  borderTopRightRadius:6 },
+    BL: { bottom:-1,left:-1, borderBottomWidth:bw,borderLeftWidth:bw, borderBottomLeftRadius:6 },
+    BR: { bottom:-1,right:-1,borderBottomWidth:bw,borderRightWidth:bw,borderBottomRightRadius:6 },
   };
-  const cornerRadii = {
-    topLeft:     { borderTopLeftRadius: 14 },
-    topRight:    { borderTopRightRadius: 14 },
-    bottomLeft:  { borderBottomLeftRadius: 14 },
-    bottomRight: { borderBottomRightRadius: 14 },
-  };
-  const borderColor = glow.interpolate({ inputRange: [0,1], outputRange: [color+'AA', '#FFFFFF'] });
-  const shadowOpacity = glow.interpolate({ inputRange: [0,1], outputRange: [0.4, 0.95] });
+  return <View style={[base, styles[pos], { borderColor: color }]} />;
+};
+
+// ─── Partícula flutuante (AI Vision) ──────────────────────────────────────
+const FloatDot = ({ angle, radius, size, color, orbitAnim, phase }) => {
+  const rot = orbitAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [`${angle}deg`, `${angle + 360}deg`],
+  });
   return (
-    <Animated.View style={[{
-      position:'absolute', width:CORNER_SZ, height:CORNER_SZ, borderColor,
-      shadowColor: color, shadowOpacity, shadowRadius: 10, elevation: 8,
-    }, pos, borders[position], cornerRadii[position]]} />
+    <Animated.View style={{
+      position: 'absolute',
+      width: size, height: size, borderRadius: size / 2,
+      backgroundColor: color,
+      shadowColor: color, shadowOpacity: 1, shadowRadius: size * 2,
+      opacity: 0.85,
+      transform: [
+        { rotate: rot },
+        { translateX: radius },
+      ],
+    }} />
   );
 };
 
+// ─── Anel pulsante ────────────────────────────────────────────────────────
+const PulseRing = ({ size, color, anim, delay = 0, strokeW = 1.5 }) => {
+  const scale = anim.interpolate({ inputRange:[0,1], outputRange:[0.6, 1.6] });
+  const opacity = anim.interpolate({ inputRange:[0,0.3,1], outputRange:[0, 0.7, 0] });
+  return (
+    <Animated.View style={{
+      position: 'absolute',
+      width: size, height: size, borderRadius: size / 2,
+      borderWidth: strokeW, borderColor: color,
+      transform: [{ scale }], opacity,
+    }} />
+  );
+};
+
+// ─── Barra de progresso consultando ───────────────────────────────────────
+const ScanProgressBar = ({ prog, color }) => (
+  <View style={{ width: 200, height: 3, backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 2, overflow: 'hidden' }}>
+    <Animated.View style={{
+      height: 3, borderRadius: 2,
+      backgroundColor: color,
+      shadowColor: color, shadowOpacity: 1, shadowRadius: 8,
+      width: prog.interpolate({ inputRange:[0,1], outputRange:['0%','100%'] }),
+    }} />
+  </View>
+);
+
+// ─── Main Scanner ──────────────────────────────────────────────────────────
 const ScannerModalPremium = ({
   visible, scanMode, camRef, torchOn, setTorchOn,
   onBarcode, onClose, onAIVisionCameraReady,
   showAchandoGif, T, isDarkEnv, fontScale, scanAnim, pulseAnim,
 }) => {
-  const enterAnim  = useRef(new Animated.Value(0)).current;
-  const glowAnim   = useRef(new Animated.Value(0)).current;
-  const ring1      = useRef(new Animated.Value(0.5)).current;
-  const ring2      = useRef(new Animated.Value(0.5)).current;
-  const ring3      = useRef(new Animated.Value(0.5)).current;
-  const iconRot    = useRef(new Animated.Value(0)).current;
-  const srcFade    = useRef(new Animated.Value(1)).current;
-  const textSlide  = useRef(new Animated.Value(18)).current;
-  const textOpac   = useRef(new Animated.Value(0)).current;
-  const torchScale = useRef(new Animated.Value(1)).current;
-  const orbitRot   = useRef(new Animated.Value(0)).current;
-
-  const [activeSrc, setActiveSrc] = React.useState(0);
-  const [dotIdx, setDotIdx] = React.useState(0);
-
-  const SOURCES = [
-    { label: 'GEI.IA',         icon: 'cpu',      color: '#7C3AED' },
-    { label: 'Bluesoft',       icon: 'database',  color: '#0EA5E9' },
-    { label: 'OpenFoodFacts',  icon: 'leaf',      color: '#16A34A' },
-  ];
-  const blue   = '#4F74FF';
-  const purple = '#8B5CF6';
-  const acColor = scanMode === 'barcode' ? blue : purple;
   const { width: SW, height: SH } = Dimensions.get('window');
 
-  useEffect(() => {
-    if (!visible) { enterAnim.setValue(0); return; }
-    enterAnim.setValue(0);
-    Animated.timing(enterAnim, { toValue:1, duration:380, easing:Easing.out(Easing.cubic), useNativeDriver:true }).start();
-    const glowLoop = Animated.loop(Animated.sequence([
-      Animated.timing(glowAnim, { toValue:1, duration:900, useNativeDriver:false }),
-      Animated.timing(glowAnim, { toValue:0, duration:900, useNativeDriver:false }),
-    ]));
-    glowLoop.start();
-    return () => glowLoop.stop();
-  }, [visible, scanMode]);
+  // ── Refs de animação ──────────────────────────────────────────────────────
+  const mountAnim    = useRef(new Animated.Value(0)).current;
+  const bgBlur       = useRef(new Animated.Value(0)).current;
+  const laserAnim    = useRef(new Animated.Value(0)).current;
+  const laserOpacity = useRef(new Animated.Value(0)).current;
+  const cornerGlow   = useRef(new Animated.Value(0)).current;
+  const frameBreath  = useRef(new Animated.Value(1)).current;
+  const orbitFast    = useRef(new Animated.Value(0)).current;
+  const orbitSlow    = useRef(new Animated.Value(0)).current;
+  const pulse1       = useRef(new Animated.Value(0)).current;
+  const pulse2       = useRef(new Animated.Value(0)).current;
+  const pulse3       = useRef(new Animated.Value(0)).current;
+  const aiCoreScale  = useRef(new Animated.Value(1)).current;
+  const aiCoreBright = useRef(new Animated.Value(0)).current;
+  const torchBtnA    = useRef(new Animated.Value(1)).current;
+  const headerSlide  = useRef(new Animated.Value(-80)).current;
+  const hintFade     = useRef(new Animated.Value(0)).current;
+  const consultAnim  = useRef(new Animated.Value(0)).current;
+  const consultProg  = useRef(new Animated.Value(0)).current;
+  const consultSpin  = useRef(new Animated.Value(0)).current;
+  const srcPulse     = useRef(new Animated.Value(1)).current;
+  const successScale = useRef(new Animated.Value(0)).current;
+  const scanLineX    = useRef(new Animated.Value(0)).current;
 
+  const [tipIdx,   setTipIdx]   = React.useState(0);
+  const [srcIdx,   setSrcIdx]   = React.useState(0);
+  const [dotCount, setDotCount] = React.useState(0);
+
+  const TIPS_B = ['📏 15–25 cm de distância','💡 Evite reflexo na embalagem','🔄 Centralize o código','⚡ Use flash em locais escuros'];
+  const TIPS_A = ['📸 Aponte para a frente da embalagem','🎯 Produto centralizado','💡 Boa iluminação ajuda','🏷️ Mostre a etiqueta principal'];
+  const SOURCES = [
+    { label:'Bluesoft Cosmos', icon:'database',   color: NEON_CYAN   },
+    { label:'GEI Vision IA',   icon:'cpu',        color: NEON_PURPLE },
+    { label:'Open Food Facts', icon:'server',     color:'#10B981'    },
+  ];
+
+  const tips = scanMode === 'barcode' ? TIPS_B : TIPS_A;
+  const acColor = scanMode === 'barcode' ? NEON_BLUE : NEON_PURPLE;
+  const src = SOURCES[srcIdx];
+
+  // ── Entrada ────────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!showAchandoGif) return;
-    // Anéis pulsantes para overlay "Consultando"
-    const makeRingLoop = (anim, delay) => Animated.loop(Animated.sequence([
-      Animated.delay(delay),
-      Animated.timing(anim, { toValue:1.55, duration:1300, easing:Easing.out(Easing.cubic), useNativeDriver:true }),
-      Animated.timing(anim, { toValue:0.5, duration:0, useNativeDriver:true }),
-    ]));
-    const r1 = makeRingLoop(ring1, 0);
-    const r2 = makeRingLoop(ring2, 380);
-    const r3 = makeRingLoop(ring3, 760);
-    const rotLoop = Animated.loop(Animated.timing(iconRot, { toValue:1, duration:2000, easing:Easing.linear, useNativeDriver:true }));
-    r1.start(); r2.start(); r3.start(); rotLoop.start();
-    textSlide.setValue(18); textOpac.setValue(0);
+    if (!visible) { mountAnim.setValue(0); headerSlide.setValue(-80); hintFade.setValue(0); return; }
     Animated.parallel([
-      Animated.timing(textSlide, { toValue:0, duration:320, delay:120, easing:Easing.out(Easing.cubic), useNativeDriver:true }),
-      Animated.timing(textOpac,  { toValue:1, duration:280, delay:120, useNativeDriver:true }),
+      Animated.timing(mountAnim,   { toValue:1, duration:420, easing:Easing.out(Easing.cubic), useNativeDriver:true }),
+      Animated.timing(headerSlide, { toValue:0, duration:380, delay:80, easing:Easing.out(Easing.back(1.4)), useNativeDriver:true }),
+      Animated.timing(hintFade,    { toValue:1, duration:500, delay:300, useNativeDriver:true }),
     ]).start();
-    const dotInt = setInterval(() => setDotIdx(i => (i+1)%4), 380);
-    const srcInt = setInterval(() => {
-      Animated.timing(srcFade, { toValue:0, duration:180, useNativeDriver:true }).start(() => {
-        setActiveSrc(i => (i+1) % SOURCES.length);
-        Animated.timing(srcFade, { toValue:1, duration:220, useNativeDriver:true }).start();
-      });
-    }, 1100);
-    return () => { r1.stop(); r2.stop(); r3.stop(); rotLoop.stop(); clearInterval(dotInt); clearInterval(srcInt); };
-  }, [showAchandoGif]);
+  }, [visible]);
 
+  // ── Loop laser barcode ─────────────────────────────────────────────────────
   useEffect(() => {
-    if (!visible || scanMode !== 'aiVision') { orbitRot.setValue(0); return; }
-    const orbitLoop = Animated.loop(Animated.timing(orbitRot, { toValue: 1, duration: 6000, easing: Easing.linear, useNativeDriver: true }));
-    orbitLoop.start();
-    return () => orbitLoop.stop();
+    if (!visible || scanMode !== 'barcode') return;
+    laserOpacity.setValue(0);
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(laserOpacity, { toValue:1, duration:200, useNativeDriver:true }),
+      Animated.timing(laserAnim,    { toValue:1, duration:1800, easing:Easing.inOut(Easing.sin), useNativeDriver:true }),
+      Animated.timing(laserOpacity, { toValue:0, duration:200, useNativeDriver:true }),
+      Animated.delay(120),
+      Animated.timing(laserAnim,    { toValue:0, duration:0, useNativeDriver:true }),
+    ]));
+    const glow = Animated.loop(Animated.sequence([
+      Animated.timing(cornerGlow,  { toValue:1, duration:900, easing:Easing.inOut(Easing.sin), useNativeDriver:false }),
+      Animated.timing(cornerGlow,  { toValue:0, duration:900, easing:Easing.inOut(Easing.sin), useNativeDriver:false }),
+    ]));
+    const breath = Animated.loop(Animated.sequence([
+      Animated.timing(frameBreath, { toValue:1.008, duration:1400, easing:Easing.inOut(Easing.sin), useNativeDriver:true }),
+      Animated.timing(frameBreath, { toValue:1,     duration:1400, easing:Easing.inOut(Easing.sin), useNativeDriver:true }),
+    ]));
+    // Linha scan horizontal extra (efeito cinema)
+    const hLoop = Animated.loop(Animated.sequence([
+      Animated.timing(scanLineX, { toValue:1, duration:2200, easing:Easing.linear, useNativeDriver:true }),
+      Animated.timing(scanLineX, { toValue:0, duration:0, useNativeDriver:true }),
+      Animated.delay(300),
+    ]));
+    loop.start(); glow.start(); breath.start(); hLoop.start();
+    const ti = setInterval(() => setTipIdx(i => (i+1) % tips.length), 2600);
+    return () => { loop.stop(); glow.stop(); breath.stop(); hLoop.stop(); clearInterval(ti); };
   }, [visible, scanMode]);
+
+  // ── Loop AI Vision ─────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!visible || scanMode !== 'aiVision') return;
+    const oFast = Animated.loop(Animated.timing(orbitFast, { toValue:1, duration:4000, easing:Easing.linear, useNativeDriver:true }));
+    const oSlow = Animated.loop(Animated.timing(orbitSlow, { toValue:1, duration:10000, easing:Easing.linear, useNativeDriver:true }));
+    const makePulse = (a, delay) => Animated.loop(Animated.sequence([
+      Animated.delay(delay),
+      Animated.timing(a, { toValue:1, duration:1800, easing:Easing.out(Easing.cubic), useNativeDriver:true }),
+      Animated.timing(a, { toValue:0, duration:100, useNativeDriver:true }),
+    ]));
+    const coreLoop = Animated.loop(Animated.sequence([
+      Animated.timing(aiCoreScale,  { toValue:1.08, duration:1000, easing:Easing.inOut(Easing.sin), useNativeDriver:true }),
+      Animated.timing(aiCoreScale,  { toValue:1,    duration:1000, easing:Easing.inOut(Easing.sin), useNativeDriver:true }),
+    ]));
+    const brightLoop = Animated.loop(Animated.sequence([
+      Animated.timing(aiCoreBright, { toValue:1, duration:800, easing:Easing.inOut(Easing.sin), useNativeDriver:false }),
+      Animated.timing(aiCoreBright, { toValue:0, duration:800, easing:Easing.inOut(Easing.sin), useNativeDriver:false }),
+    ]));
+    oFast.start(); oSlow.start();
+    makePulse(pulse1, 0).start();
+    makePulse(pulse2, 600).start();
+    makePulse(pulse3, 1200).start();
+    coreLoop.start(); brightLoop.start();
+    const ti = setInterval(() => setTipIdx(i => (i+1) % tips.length), 2600);
+    return () => { oFast.stop(); oSlow.stop(); coreLoop.stop(); brightLoop.stop(); clearInterval(ti); };
+  }, [visible, scanMode]);
+
+  // ── Overlay consultando ────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!showAchandoGif) { consultAnim.setValue(0); consultProg.setValue(0); return; }
+    Animated.timing(consultAnim, { toValue:1, duration:350, easing:Easing.out(Easing.cubic), useNativeDriver:true }).start();
+    Animated.timing(consultProg, { toValue:0.82, duration:3200, easing:Easing.out(Easing.quad), useNativeDriver:false }).start();
+    const spin = Animated.loop(Animated.timing(consultSpin, { toValue:1, duration:1400, easing:Easing.linear, useNativeDriver:true }));
+    spin.start();
+    const srcInt = setInterval(() => setSrcIdx(i => (i+1) % SOURCES.length), 1100);
+    const dotInt = setInterval(() => setDotCount(i => (i+1) % 4), 380);
+    const srcA = Animated.loop(Animated.sequence([
+      Animated.timing(srcPulse, { toValue:1.12, duration:550, easing:Easing.inOut(Easing.sin), useNativeDriver:true }),
+      Animated.timing(srcPulse, { toValue:1,    duration:550, easing:Easing.inOut(Easing.sin), useNativeDriver:true }),
+    ]));
+    srcA.start();
+    return () => { spin.stop(); srcA.stop(); clearInterval(srcInt); clearInterval(dotInt); };
+  }, [showAchandoGif]);
 
   const pressTorch = () => {
     Animated.sequence([
-      Animated.timing(torchScale, { toValue:0.85, duration:80, useNativeDriver:true }),
-      Animated.spring(torchScale, { toValue:1, tension:200, friction:7, useNativeDriver:true }),
+      Animated.timing(torchBtnA, { toValue:0.78, duration:70, useNativeDriver:true }),
+      Animated.spring(torchBtnA, { toValue:1, tension:260, friction:7, useNativeDriver:true }),
     ]).start();
     setTorchOn(v => !v);
   };
 
-  const rotate = iconRot.interpolate({ inputRange:[0,1], outputRange:['0deg','360deg'] });
-  const orbitRotate = orbitRot.interpolate({ inputRange:[0,1], outputRange:['0deg','360deg'] });
-  const dots = '...'.slice(0, dotIdx);
-  const src = SOURCES[activeSrc];
-  const RINGSZ = 156;
+  // ── Derivações ─────────────────────────────────────────────────────────────
+  const laserY      = laserAnim.interpolate({ inputRange:[0,1], outputRange:[4, SCAN.BH - 6] });
+  const cornerColor = cornerGlow.interpolate({ inputRange:[0,1], outputRange:[acColor+'99', '#FFFFFF'] });
+  const spinRot     = consultSpin.interpolate({ inputRange:[0,1], outputRange:['0deg','360deg'] });
+  const orbitFastRot= orbitFast.interpolate({ inputRange:[0,1], outputRange:['0deg','360deg'] });
+  const orbitSlowRot= orbitSlow.interpolate({ inputRange:[0,1], outputRange:['0deg','-360deg'] });
+  const coreBg      = aiCoreBright.interpolate({ inputRange:[0,1], outputRange:[NEON_PURPLE+'22', NEON_VIOLET+'44'] });
+  const scanHX      = scanLineX.interpolate({ inputRange:[0,1], outputRange:[-SCAN.BW/2, SCAN.BW/2] });
 
-  const laserTop = scanAnim.interpolate({ inputRange:[0,1], outputRange:[6, BARCODE_VH - 6] });
-  const laserOp  = scanAnim.interpolate({ inputRange:[0,0.08,0.92,1], outputRange:[0,1,1,0] });
-  const aiScale  = pulseAnim.interpolate({ inputRange:[1,1.07], outputRange:[1,1.08] });
+  const sideW = (SW - SCAN.BW) / 2;
+  const sideWAI = (SW - SCAN.AW) / 2;
+  const topH  = (SH - (scanMode === 'barcode' ? SCAN.BH : SCAN.AW)) / 2 - 10;
 
-  const sideW = (SW - (scanMode === 'barcode' ? BARCODE_VW : AI_VW)) / 2;
-  const viewH = scanMode === 'barcode' ? BARCODE_VH : AI_VW;
-  const topH  = (SH - viewH) / 2 - 20;
+  const DOT_SIZES   = [7, 5, 8, 5, 6];
+  const DOT_ANGLES  = [0, 72, 144, 216, 288];
+  const DOT_COLORS  = [NEON_PURPLE, '#FFFFFF', NEON_VIOLET, NEON_CYAN, NEON_PURPLE];
+  const DOT_RADII   = [SCAN.AW/2 + 10, SCAN.AW/2 + 16, SCAN.AW/2 + 8, SCAN.AW/2 + 18, SCAN.AW/2 + 12];
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={false} onRequestClose={onClose} statusBarTranslucent>
-      <View style={StyleSheet.absoluteFill}>
-        {/* ── Câmera ── */}
+    <Modal visible={visible} animationType="none" transparent={false} onRequestClose={onClose} statusBarTranslucent>
+      <View style={{ flex:1, backgroundColor:'#000' }}>
+
+        {/* ── Câmera full-screen ── */}
         <CameraView
           ref={camRef}
           style={StyleSheet.absoluteFill}
           enableTorch={torchOn}
           onBarcodeScanned={scanMode === 'barcode' ? onBarcode : undefined}
-          barcodeScannerSettings={{ barcodeTypes: ['ean13','upc_a','ean8','qr','code128'] }}
+          barcodeScannerSettings={{ barcodeTypes:['ean13','upc_a','ean8','qr','code128','itf14'] }}
           onCameraReady={scanMode === 'aiVision' ? onAIVisionCameraReady : undefined}
         />
 
-        {/* ── Vinheta ── */}
-        <View pointerEvents="none" style={StyleSheet.absoluteFillObject}>
-          <View style={{ height: topH, backgroundColor: 'rgba(0,0,0,0.56)' }} />
-          <View style={{ flexDirection:'row', height: viewH }}>
-            <View style={{ width: sideW, backgroundColor: 'rgba(0,0,0,0.56)' }} />
-            <View style={{ width: scanMode === 'barcode' ? BARCODE_VW : AI_VW }} />
-            <View style={{ flex:1, backgroundColor: 'rgba(0,0,0,0.56)' }} />
+        {/* ── Vinheta (4 painéis opacos ao redor do visor) ── */}
+        {scanMode === 'barcode' && (
+          <View pointerEvents="none" style={StyleSheet.absoluteFillObject}>
+            <View style={{ height: topH, backgroundColor:'rgba(0,0,0,0.80)' }} />
+            <View style={{ height: SCAN.BH, flexDirection:'row' }}>
+              <View style={{ width: sideW, backgroundColor:'rgba(0,0,0,0.80)' }} />
+              <View style={{ width: SCAN.BW }} />
+              <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.80)' }} />
+            </View>
+            <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.80)' }} />
           </View>
-          <View style={{ flex:1, backgroundColor: 'rgba(0,0,0,0.56)' }} />
-        </View>
-
-        {/* ── UI Principal ── */}
-        <Animated.View style={{ ...StyleSheet.absoluteFillObject, opacity: enterAnim, alignItems:'center', justifyContent:'center' }}>
-
-          {/* Viewfinder Barcode — redesenhado: grade sutil + laser com trilha em camadas */}
-          {scanMode === 'barcode' && (
-            <Animated.View style={{
-              width: BARCODE_VW, height: BARCODE_VH, position:'relative',
-              transform: [{ scale: glowAnim.interpolate({ inputRange:[0,1], outputRange:[1,1.008] }) }],
-            }}>
-              <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: blue+'08', borderRadius:18 }} />
-              {/* Grade sutil de alinhamento — 3 linhas verticais finas */}
-              <View pointerEvents="none" style={{ ...StyleSheet.absoluteFillObject, flexDirection:'row', justifyContent:'space-evenly', paddingHorizontal: BARCODE_VW * 0.18 }}>
-                {[0,1,2].map(i => <View key={i} style={{ width:1, backgroundColor: blue+'14' }} />)}
+        )}
+        {scanMode === 'aiVision' && (
+          <View pointerEvents="none" style={StyleSheet.absoluteFillObject}>
+            <View style={{ height: topH, backgroundColor:'rgba(0,0,0,0.82)' }} />
+            <View style={{ height: SCAN.AW, flexDirection:'row' }}>
+              <View style={{ width: sideWAI, backgroundColor:'rgba(0,0,0,0.82)' }} />
+              <View style={{ width: SCAN.AW, borderRadius: SCAN.AW/2, overflow:'hidden' }}>
+                {/* Máscara circular — deixa a câmera visível só no círculo */}
               </View>
-              <Animated.View style={{
-                ...StyleSheet.absoluteFillObject, borderRadius:18, borderWidth:1.5,
-                borderColor: blue+'35',
-                shadowColor: blue,
-                shadowOpacity: glowAnim.interpolate({ inputRange:[0,1], outputRange:[0.3,0.75] }),
-                shadowRadius:26, elevation:12,
-              }} />
-              {['topLeft','topRight','bottomLeft','bottomRight'].map(p =>
-                <ScanCorner key={p} position={p} color={blue} glow={glowAnim} />
-              )}
-              {/* Laser redesenhado: núcleo brilhante + trilha de desfoque em 3 camadas + reflexo */}
-              <Animated.View pointerEvents="none" style={{
-                position:'absolute', left:6, right:6, top: laserTop, opacity: laserOp,
-              }}>
-                {/* Trilha de desfoque larga (camada mais externa, mais sutil) */}
-                <View style={{ position:'absolute', top:-14, left:0, right:0, height:30, backgroundColor: blue+'10', borderRadius:15 }} />
-                {/* Trilha intermediária */}
-                <View style={{ position:'absolute', top:-6, left:0, right:0, height:14, backgroundColor: blue+'28', borderRadius:7 }} />
-                {/* Núcleo do laser com gradiente simulado por camadas finas */}
-                <View style={{ height:3, backgroundColor:'#FFFFFF', borderRadius:2, shadowColor: blue, shadowOpacity:1, shadowRadius:12, elevation:14 }} />
-                <View style={{ position:'absolute', top:0.5, left:0, right:0, height:2, backgroundColor: blue, borderRadius:1.5, opacity:0.9 }} />
-              </Animated.View>
-            </Animated.View>
-          )}
-
-          {/* Viewfinder AI Vision — redesenhado: anéis com profundidade + partículas orbitando */}
-          {scanMode === 'aiVision' && (
-            <View style={{ width:AI_VW, height:AI_VW, alignItems:'center', justifyContent:'center' }}>
-              {/* Anéis externos com gradiente de opacidade suave */}
-              {[1.16, 1.0, 0.86].map((mult, idx) => (
-                <Animated.View key={idx} style={{
-                  position:'absolute',
-                  width: AI_VW * mult, height: AI_VW * mult,
-                  borderRadius: AI_VW * mult / 2,
-                  borderWidth: idx === 1 ? 2.5 : 1,
-                  borderColor: purple,
-                  borderStyle: idx === 0 ? 'dashed' : 'solid',
-                  opacity: idx === 1 ? glowAnim.interpolate({ inputRange:[0,1], outputRange:[0.6,1] }) : idx === 0 ? 0.18 : 0.3,
-                  transform: [{ scale: idx === 1 ? aiScale : 1 }, { rotate: idx === 0 ? orbitRotate : '0deg' }],
-                  shadowColor: purple,
-                  shadowOpacity: idx === 1 ? 0.55 : 0,
-                  shadowRadius: 26, elevation: idx === 1 ? 14 : 0,
-                }} />
-              ))}
-              {/* Partículas orbitando — substituem o crosshair estático */}
-              {[0,72,144,216,288].map((deg, i) => (
-                <Animated.View key={deg} style={{
-                  position:'absolute', width:5, height:5, borderRadius:2.5,
-                  backgroundColor: i % 2 === 0 ? purple : '#FFFFFF',
-                  opacity: 0.75,
-                  shadowColor: purple, shadowOpacity:0.9, shadowRadius:6, elevation:6,
-                  transform: [{ rotate: orbitRotate }, { translateX: AI_VW * 0.5 }, { rotate: `${deg}deg` }],
-                }} />
-              ))}
-              {/* Ícone central — anel duplo (halo suave + núcleo nítido) */}
-              <View style={{ width:108, height:108, borderRadius:54, backgroundColor: purple+'0C', alignItems:'center', justifyContent:'center' }}>
-                <Animated.View style={{
-                  width:84, height:84, borderRadius:42,
-                  backgroundColor: purple+'1C',
-                  borderWidth:2.5, borderColor:purple,
-                  alignItems:'center', justifyContent:'center',
-                  transform:[{ scale: aiScale }],
-                  shadowColor:purple, shadowOpacity:0.65, shadowRadius:30, elevation:16,
-                }}>
-                  <MaterialCommunityIcons name="robot-outline" size={40} color={purple} />
-                </Animated.View>
-              </View>
+              <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.82)' }} />
             </View>
-          )}
-
-          {/* Label inferior — redesenhado com vidro consistente */}
-          <View style={{
-            position:'absolute', bottom:100, left:0, right:0, alignItems:'center', paddingHorizontal:32,
-          }}>
-            <View style={{
-              flexDirection:'row', alignItems:'center', gap:8,
-              paddingHorizontal:18, paddingVertical:10,
-              backgroundColor:'rgba(255,255,255,0.10)',
-              borderRadius:22, borderWidth:1,
-              borderColor:'rgba(255,255,255,0.18)',
-              marginBottom:10,
-            }}>
-              <View style={{ width:7, height:7, borderRadius:3.5, backgroundColor: acColor, shadowColor: acColor, shadowOpacity:0.8, shadowRadius:5 }} />
-              <Text style={{ color:'#FFF', fontSize:13*fontScale, fontWeight:'900', letterSpacing:0.3 }}>
-                {scanMode === 'barcode' ? 'Posicione o código de barras' : 'IA Vision · Gemini'}
-              </Text>
-            </View>
-            <Text style={{ color:'rgba(255,255,255,0.55)', fontSize:12*fontScale, fontWeight:'600', textAlign:'center' }}>
-              {scanMode === 'barcode' ? 'Nome preenchido automaticamente pela IA' : 'Aponte para qualquer embalagem do produto'}
-            </Text>
+            <View style={{ flex:1, backgroundColor:'rgba(0,0,0,0.82)' }} />
           </View>
+        )}
 
-          {/* Aviso ambiente escuro */}
-          {isDarkEnv && !torchOn && (
-            <View style={{
-              position:'absolute', bottom:165, left:24, right:24,
-              backgroundColor:'rgba(252,211,77,0.12)',
-              borderRadius:18, borderWidth:1.5, borderColor:'rgba(252,211,77,0.45)',
-              paddingHorizontal:14, paddingVertical:10,
-              flexDirection:'row', alignItems:'center', gap:9,
-            }}>
-              <Feather name="sun" size={15} color="#FCD34D" />
-              <Text style={{ color:'#FCD34D', fontSize:12*fontScale, fontWeight:'700', flex:1 }}>
-                Ambiente escuro — ative o flash para melhor leitura
-              </Text>
-            </View>
-          )}
-        </Animated.View>
-
-        {/* ── Header: botões — redesenhado com vidro mais translúcido ── */}
+        {/* ════════════════════════════════════════════
+             HEADER FLUTUANTE
+        ════════════════════════════════════════════ */}
         <Animated.View style={{
-          position:'absolute', top:48, left:0, right:0,
-          paddingHorizontal:20, flexDirection:'row',
-          alignItems:'center', justifyContent:'space-between',
-          opacity: enterAnim,
+          position:'absolute', top:0, left:0, right:0,
+          paddingTop: 50, paddingBottom: 16, paddingHorizontal: 18,
+          flexDirection:'row', alignItems:'center', justifyContent:'space-between',
+          transform:[{ translateY: headerSlide }],
+          opacity: mountAnim,
         }}>
           {/* Fechar */}
-          <TouchableOpacity onPress={onClose} activeOpacity={0.8} style={{
-            width:46, height:46, borderRadius:18,
+          <TouchableOpacity onPress={onClose} activeOpacity={0.75} style={{
+            width:46, height:46, borderRadius:23,
             backgroundColor:'rgba(255,255,255,0.10)',
-            borderWidth:1, borderColor:'rgba(255,255,255,0.22)',
+            borderWidth:1, borderColor:'rgba(255,255,255,0.20)',
             alignItems:'center', justifyContent:'center',
+            shadowColor:'#000', shadowOpacity:0.5, shadowRadius:12,
           }}>
             <Feather name="x" size={20} color="#FFF" />
           </TouchableOpacity>
 
-          {/* Título com badge pulsante */}
-          <View style={{ flex:1, alignItems:'center', paddingHorizontal:10 }}>
-            <View style={{ flexDirection:'row', alignItems:'center', gap:6, backgroundColor:'rgba(255,255,255,0.08)', paddingHorizontal:14, paddingVertical:6, borderRadius:16, borderWidth:1, borderColor:'rgba(255,255,255,0.16)' }}>
-              <Animated.View style={{ width:6, height:6, borderRadius:3, backgroundColor: acColor, opacity: glowAnim.interpolate({ inputRange:[0,1], outputRange:[0.5,1] }) }} />
-              <Text style={{
-                color:'#FFF', fontSize:13.5*fontScale, fontWeight:'900', letterSpacing:0.2,
-              }}>
-                {scanMode === 'barcode' ? 'Código de Barras' : 'IA Vision'}
+          {/* Título */}
+          <View style={{ alignItems:'center', flex:1, paddingHorizontal:10 }}>
+            <View style={{ flexDirection:'row', alignItems:'center', gap:7 }}>
+              {/* Ponto de status pulsante */}
+              <Animated.View style={{
+                width:7, height:7, borderRadius:3.5,
+                backgroundColor: acColor,
+                shadowColor: acColor, shadowOpacity:1, shadowRadius:8,
+                opacity: cornerGlow.interpolate({ inputRange:[0,1], outputRange:[0.5,1] }),
+              }} />
+              <Text style={{ color:'#FFF', fontWeight:'900', fontSize:15*fontScale, letterSpacing:0.2 }}>
+                {scanMode === 'barcode' ? 'Escanear Produto' : 'IA Vision'}
               </Text>
             </View>
-            <Text style={{ color: acColor, fontSize:10.5*fontScale, fontWeight:'700', marginTop:5 }}>
-              {scanMode === 'barcode' ? 'EAN-13 · EAN-8 · QR · Code128' : 'Powered by Gemini'}
+            <Text style={{ color: acColor, fontSize:10*fontScale, fontWeight:'700', marginTop:2, letterSpacing:0.5 }}>
+              {scanMode === 'barcode' ? 'EAN-13 · EAN-8 · QR · CODE-128' : 'Gemini Flash · Reconhecimento visual'}
             </Text>
           </View>
 
           {/* Flash */}
-          <Animated.View style={{ transform:[{ scale: torchScale }] }}>
-            <TouchableOpacity onPress={pressTorch} activeOpacity={0.8} style={{
-              width:46, height:46, borderRadius:18,
+          <Animated.View style={{ transform:[{ scale: torchBtnA }] }}>
+            <TouchableOpacity onPress={pressTorch} activeOpacity={0.75} style={{
+              width:46, height:46, borderRadius:23,
               backgroundColor: torchOn ? '#FCD34D' : 'rgba(255,255,255,0.10)',
-              borderWidth:1,
-              borderColor: torchOn ? '#FCD34D' : 'rgba(255,255,255,0.22)',
+              borderWidth:1.5, borderColor: torchOn ? '#FCD34D' : 'rgba(255,255,255,0.20)',
               alignItems:'center', justifyContent:'center',
-              shadowColor: torchOn ? '#FCD34D' : '#000',
-              shadowOpacity: torchOn ? 0.8 : 0.2,
-              shadowRadius: torchOn ? 18 : 4,
-              elevation: torchOn ? 12 : 3,
+              shadowColor: torchOn ? '#FCD34D' : 'transparent',
+              shadowOpacity: torchOn ? 1 : 0, shadowRadius: torchOn ? 24 : 0, elevation: torchOn ? 14 : 0,
             }}>
-              <Feather name="zap" size={19} color={torchOn ? '#3A2A00' : '#FFF'} />
+              <Feather name={torchOn ? 'zap-off' : 'zap'} size={19} color={torchOn ? '#1A1000' : '#FFF'} />
             </TouchableOpacity>
           </Animated.View>
         </Animated.View>
 
-        {/* ════════════════════════════════════════════════════
-             OVERLAY "CONSULTANDO FONTES" — redesenhado do zero
-        ════════════════════════════════════════════════════ */}
-        {showAchandoGif && (
-          <View style={{
+        {/* ════════════════════════════════════════════
+             VIEWFINDER BARCODE
+        ════════════════════════════════════════════ */}
+        {scanMode === 'barcode' && (
+          <Animated.View style={{
             ...StyleSheet.absoluteFillObject,
-            backgroundColor:'rgba(5,4,16,0.97)',
             alignItems:'center', justifyContent:'center',
-            zIndex:999,
+            opacity: mountAnim,
           }}>
-            {/* ── Bloco único: agrupa anéis+ícone+textos+cards para centralizar o CONJUNTO, não cada peça isoladamente ── */}
-            <View style={{ alignItems:'center', justifyContent:'center', position:'relative' }}>
-              {/* Glow de fundo suave atrás dos anéis — centrado matematicamente sobre o bloco do ícone (104x104) */}
-              <View pointerEvents="none" style={{ position:'absolute', top: 52 - 140, left: 52 - 140, width:280, height:280, borderRadius:140, backgroundColor:'#7C5CFF', opacity:0.06 }} />
+            {/* Label "Aproxime o código" */}
+            <Animated.View style={{
+              flexDirection:'row', alignItems:'center', gap:6, marginBottom:18,
+              opacity: hintFade,
+              transform:[{ translateY: hintFade.interpolate({ inputRange:[0,1], outputRange:[10,0] }) }],
+            }}>
+              <Feather name="maximize" size={12} color={NEON_BLUE} />
+              <Text style={{ color:'rgba(255,255,255,0.75)', fontWeight:'700', fontSize:12*fontScale, letterSpacing:0.5 }}>
+                Aproxime o código de barras
+              </Text>
+            </Animated.View>
 
-              {/* Anéis de pulso + ícone — agrupados num bloco de altura fixa (104px), centralizados entre si */}
-              <View style={{ width:104, height:104, alignItems:'center', justifyContent:'center' }}>
-                {[ring1, ring2, ring3].map((anim, idx) => (
-                  <Animated.View key={idx} style={{
+            {/* Frame principal animado */}
+            <Animated.View style={{ transform:[{ scale: frameBreath }] }}>
+              <View style={{
+                width: SCAN.BW, height: SCAN.BH,
+                alignItems:'center', justifyContent:'center',
+                position:'relative',
+              }}>
+                {/* Fundo do visor com gradiente escuro sutil */}
+                <View style={{
+                  ...StyleSheet.absoluteFillObject,
+                  backgroundColor: NEON_BLUE + '08',
+                  borderRadius:4,
+                }} />
+
+                {/* Borda animada do frame */}
+                <Animated.View style={{
+                  ...StyleSheet.absoluteFillObject,
+                  borderRadius:4, borderWidth:1,
+                  borderColor: cornerGlow.interpolate({
+                    inputRange:[0,1], outputRange:[NEON_BLUE+'28', NEON_BLUE+'70'],
+                  }),
+                }} />
+
+                {/* Cantos */}
+                {['TL','TR','BL','BR'].map(p => (
+                  <Animated.View key={p} style={{
                     position:'absolute',
-                    width:RINGSZ, height:RINGSZ, borderRadius:RINGSZ/2,
-                    borderWidth: idx===0 ? 2.5 : idx===1 ? 1.5 : 1,
-                    borderColor: idx===1 ? '#A78BFA' : '#7C5CFF',
-                    transform:[{ scale: anim }],
-                    opacity: anim.interpolate({ inputRange:[0.5,1,1.55], outputRange:[0.7,0.35,0] }),
+                    top: p.includes('T') ? -1 : undefined,
+                    bottom: p.includes('B') ? -1 : undefined,
+                    left: p.includes('L') ? -1 : undefined,
+                    right: p.includes('R') ? -1 : undefined,
+                    width: SCAN.CS, height: SCAN.CS,
+                    borderTopWidth:    p.includes('T') ? SCAN.CT : 0,
+                    borderBottomWidth: p.includes('B') ? SCAN.CT : 0,
+                    borderLeftWidth:   p.includes('L') ? SCAN.CT : 0,
+                    borderRightWidth:  p.includes('R') ? SCAN.CT : 0,
+                    borderTopLeftRadius:     p === 'TL' ? 7 : 0,
+                    borderTopRightRadius:    p === 'TR' ? 7 : 0,
+                    borderBottomLeftRadius:  p === 'BL' ? 7 : 0,
+                    borderBottomRightRadius: p === 'BR' ? 7 : 0,
+                    borderColor: cornerColor,
+                    shadowColor: acColor, shadowOpacity: 1, shadowRadius: 8,
                   }} />
                 ))}
 
-                {/* Ícone central — anel duplo com badge de fonte ativa no canto */}
-                <Animated.View style={{
-                  width:80, height:80, borderRadius:24,
-                  backgroundColor:'rgba(124,92,255,0.16)',
-                  borderWidth:2, borderColor:'rgba(124,92,255,0.55)',
-                  alignItems:'center', justifyContent:'center',
-                  shadowColor:'#7C5CFF', shadowOpacity:0.85, shadowRadius:30, elevation:20,
-                  transform:[{ rotate }],
+                {/* LASER — linha principal */}
+                <Animated.View pointerEvents="none" style={{
+                  position:'absolute', left:0, right:0,
+                  top: laserY, opacity: laserOpacity,
                 }}>
-                  <MaterialCommunityIcons name="barcode-scan" size={34} color="#A78BFA" />
+                  {/* Halo superior difuso */}
+                  <View style={{ position:'absolute', bottom:2, left:0, right:0, height:30, backgroundColor:NEON_BLUE+'12', borderRadius:15 }} />
+                  {/* Halo médio */}
+                  <View style={{ position:'absolute', bottom:1, left:'5%', right:'5%', height:12, backgroundColor:NEON_BLUE+'28', borderRadius:6 }} />
+                  {/* Núcleo da linha */}
+                  <View style={{ height:2, backgroundColor:'#FFFFFF', borderRadius:1, shadowColor:NEON_BLUE, shadowOpacity:1, shadowRadius:10, elevation:10 }} />
+                  {/* Reflexo top */}
+                  <View style={{ position:'absolute', top:-1, left:'15%', right:'15%', height:1, backgroundColor:NEON_CYAN+'90', borderRadius:1 }} />
+                  {/* Handles nas extremidades */}
+                  <View style={{ position:'absolute', top:-4, left:-2, width:6, height:10, backgroundColor:NEON_BLUE, borderRadius:3 }} />
+                  <View style={{ position:'absolute', top:-4, right:-2, width:6, height:10, backgroundColor:NEON_BLUE, borderRadius:3 }} />
                 </Animated.View>
-                {/* Badge da fonte ativa, sobreposto no canto do ícone */}
-                <Animated.View style={{
-                  position:'absolute', bottom:-4, right:-4,
-                  width:34, height:34, borderRadius:12,
-                  backgroundColor: src.color, alignItems:'center', justifyContent:'center',
-                  borderWidth:2.5, borderColor:'#05040F',
-                  opacity: srcFade,
-                }}>
-                  <Feather name={src.icon} size={14} color="#FFF" />
-                </Animated.View>
-              </View>
 
-              {/* Textos animados */}
-              <Animated.View style={{
-                marginTop:30, alignItems:'center',
-                transform:[{ translateY: textSlide }],
-                opacity: textOpac,
-              }}>
-                <Text style={{ color:'#FFF', fontSize:21, fontWeight:'900', letterSpacing:-0.4, marginBottom:5, textAlign:'center' }}>
-                  Consultando fontes{dots}
-                </Text>
-                <Text style={{ color:'rgba(255,255,255,0.42)', fontSize:12.5, fontWeight:'600', marginBottom:22, textAlign:'center' }}>
-                  Buscando dados do produto em tempo real
-                </Text>
+                {/* Linha scan horizontal (cinema) — cruza da esquerda pra direita */}
+                <Animated.View pointerEvents="none" style={{
+                  position:'absolute', top:0, bottom:0, width:2,
+                  backgroundColor: NEON_CYAN+'40',
+                  shadowColor: NEON_CYAN, shadowOpacity:0.7, shadowRadius:6,
+                  transform:[{ translateX: scanHX }],
+                  opacity: laserOpacity,
+                }} />
 
-                {/* Cards de fonte — estilo stepper horizontal, fonte ativa em destaque */}
-                <View style={{ flexDirection:'row', gap:8, justifyContent:'center' }}>
-                  {SOURCES.map((s, i) => {
-                    const isActive = i === activeSrc;
-                    return (
-                      <Animated.View key={i} style={{
-                        flexDirection:'row', alignItems:'center', gap:6,
-                        paddingHorizontal: isActive ? 14 : 10, paddingVertical:8,
-                        backgroundColor: isActive ? s.color+'22' : 'rgba(255,255,255,0.05)',
-                        borderRadius:16, borderWidth:1.5,
-                        borderColor: isActive ? s.color+'70' : 'rgba(255,255,255,0.1)',
-                        opacity: isActive ? srcFade : 0.5,
-                      }}>
-                        <Feather name={s.icon} size={12} color={isActive ? s.color : 'rgba(255,255,255,0.4)'} />
-                        {isActive && <Text style={{ color:s.color, fontWeight:'800', fontSize:12 }}>{s.label}</Text>}
-                      </Animated.View>
-                    );
-                  })}
+                {/* Grade de alinhamento */}
+                <View pointerEvents="none" style={{ ...StyleSheet.absoluteFillObject }}>
+                  {[0.33, 0.66].map((x, i) => (
+                    <View key={i} style={{ position:'absolute', left:`${x*100}%`, top:0, bottom:0, width:1, backgroundColor:NEON_BLUE+'12' }} />
+                  ))}
+                  <View style={{ position:'absolute', top:'50%', left:0, right:0, height:1, backgroundColor:NEON_BLUE+'10' }} />
                 </View>
+              </View>
+            </Animated.View>
+
+            {/* Dica rotativa */}
+            <Animated.View style={{ marginTop:20, opacity: hintFade }}>
+              <Text style={{ color:'rgba(255,255,255,0.45)', fontSize:11.5*fontScale, fontWeight:'600', textAlign:'center' }}>
+                {tips[tipIdx]}
+              </Text>
+            </Animated.View>
+
+            {/* Fonte label */}
+            <View style={{ position:'absolute', bottom:106, left:0, right:0, alignItems:'center', gap:8 }}>
+              <View style={{ flexDirection:'row', gap:6 }}>
+                {SOURCES.map((s, i) => (
+                  <View key={i} style={{
+                    flexDirection:'row', alignItems:'center', gap:4,
+                    paddingHorizontal:9, paddingVertical:5,
+                    backgroundColor:'rgba(255,255,255,0.07)',
+                    borderRadius:12, borderWidth:1, borderColor:'rgba(255,255,255,0.12)',
+                  }}>
+                    <Feather name={s.icon} size={9} color={s.color} />
+                    <Text style={{ color:'rgba(255,255,255,0.45)', fontSize:9*fontScale, fontWeight:'700' }}>{s.label}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </Animated.View>
+        )}
+
+        {/* ════════════════════════════════════════════
+             VIEWFINDER AI VISION
+        ════════════════════════════════════════════ */}
+        {scanMode === 'aiVision' && (
+          <Animated.View style={{
+            ...StyleSheet.absoluteFillObject,
+            alignItems:'center', justifyContent:'center',
+            opacity: mountAnim,
+          }}>
+            {/* Container de todos os anéis e partículas */}
+            <View style={{ width: SCAN.AW + 80, height: SCAN.AW + 80, alignItems:'center', justifyContent:'center' }}>
+
+              {/* Anéis de pulso */}
+              <PulseRing size={SCAN.AW + 50} color={NEON_PURPLE} anim={pulse1} strokeW={1}   />
+              <PulseRing size={SCAN.AW + 50} color={NEON_VIOLET} anim={pulse2} strokeW={1.5} />
+              <PulseRing size={SCAN.AW + 50} color={NEON_CYAN}   anim={pulse3} strokeW={0.8} />
+
+              {/* Anel externo girando devagar (sentido anti-horário, tracejado) */}
+              <Animated.View style={{
+                position:'absolute',
+                width: SCAN.AW + 48, height: SCAN.AW + 48,
+                borderRadius: (SCAN.AW + 48) / 2,
+                borderWidth:1, borderColor: NEON_PURPLE+'30',
+                borderStyle:'dashed',
+                transform:[{ rotate: orbitSlowRot }],
+              }} />
+
+              {/* Anel médio girando rápido */}
+              <Animated.View style={{
+                position:'absolute',
+                width: SCAN.AW + 22, height: SCAN.AW + 22,
+                borderRadius: (SCAN.AW + 22) / 2,
+                borderWidth:2.5, borderColor: NEON_PURPLE,
+                borderStyle:'solid',
+                shadowColor: NEON_PURPLE, shadowOpacity:0.7, shadowRadius:24, elevation:16,
+                transform:[{ rotate: orbitFastRot }],
+                // Borda com "abertura" no topo (efeito arco)
+                borderTopColor:'transparent', borderTopWidth:2.5,
+              }} />
+
+              {/* Partículas orbitando */}
+              {DOT_ANGLES.map((angle, i) => (
+                <FloatDot
+                  key={i}
+                  angle={angle} radius={DOT_RADII[i]}
+                  size={DOT_SIZES[i]} color={DOT_COLORS[i]}
+                  orbitAnim={i % 2 === 0 ? orbitFast : orbitSlow}
+                  phase={i}
+                />
+              ))}
+
+              {/* Anel interno fixo */}
+              <View style={{
+                position:'absolute',
+                width: SCAN.AW - 8, height: SCAN.AW - 8,
+                borderRadius: (SCAN.AW - 8) / 2,
+                borderWidth:1, borderColor: NEON_PURPLE+'35',
+              }} />
+
+              {/* Núcleo: ícone do robô */}
+              <Animated.View style={{
+                width:96, height:96, borderRadius:48,
+                backgroundColor: coreBg,
+                borderWidth:2.5, borderColor: NEON_PURPLE,
+                alignItems:'center', justifyContent:'center',
+                transform:[{ scale: aiCoreScale }],
+                shadowColor: NEON_PURPLE, shadowOpacity:0.9, shadowRadius:36, elevation:22,
+              }}>
+                <MaterialCommunityIcons name="robot-outline" size={44} color={NEON_PURPLE} />
               </Animated.View>
             </View>
-          </View>
+
+            {/* Label abaixo */}
+            <Animated.View style={{ marginTop:24, alignItems:'center', opacity: hintFade, gap:6 }}>
+              <Text style={{ color:'rgba(255,255,255,0.70)', fontWeight:'800', fontSize:13*fontScale, letterSpacing:0.2 }}>
+                IA Vision Ativa
+              </Text>
+              <Text style={{ color:'rgba(255,255,255,0.38)', fontSize:11*fontScale, fontWeight:'600' }}>
+                {tips[tipIdx]}
+              </Text>
+            </Animated.View>
+
+            {/* Fonte pills */}
+            <View style={{ position:'absolute', bottom:106, left:0, right:0, alignItems:'center', gap:8 }}>
+              <View style={{ flexDirection:'row', gap:6 }}>
+                {SOURCES.map((s, i) => (
+                  <View key={i} style={{
+                    flexDirection:'row', alignItems:'center', gap:4,
+                    paddingHorizontal:9, paddingVertical:5,
+                    backgroundColor:'rgba(255,255,255,0.07)',
+                    borderRadius:12, borderWidth:1, borderColor:'rgba(255,255,255,0.12)',
+                  }}>
+                    <Feather name={s.icon} size={9} color={s.color} />
+                    <Text style={{ color:'rgba(255,255,255,0.45)', fontSize:9*fontScale, fontWeight:'700' }}>{s.label}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </Animated.View>
         )}
+
+        {/* ════════════════════════════════════════════
+             AVISO AMBIENTE ESCURO
+        ════════════════════════════════════════════ */}
+        {isDarkEnv && !torchOn && (
+          <Animated.View style={{
+            position:'absolute', bottom:180, left:20, right:20,
+            backgroundColor:'rgba(252,211,77,0.08)',
+            borderRadius:18, borderWidth:1.5, borderColor:'rgba(252,211,77,0.35)',
+            paddingHorizontal:14, paddingVertical:10,
+            flexDirection:'row', alignItems:'center', gap:10,
+            opacity: mountAnim,
+          }}>
+            <Feather name="sun" size={14} color="#FCD34D" />
+            <Text style={{ color:'#FCD34D', fontSize:11.5*fontScale, fontWeight:'700', flex:1 }}>
+              Ambiente escuro — ative o flash
+            </Text>
+            <TouchableOpacity onPress={pressTorch} style={{
+              paddingHorizontal:11, paddingVertical:5,
+              backgroundColor:'rgba(252,211,77,0.18)',
+              borderRadius:10, borderWidth:1, borderColor:'rgba(252,211,77,0.35)',
+            }}>
+              <Text style={{ color:'#FCD34D', fontSize:11*fontScale, fontWeight:'800' }}>Ligar</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+
+        {/* ════════════════════════════════════════════
+             OVERLAY "CONSULTANDO FONTES"
+        ════════════════════════════════════════════ */}
+        {showAchandoGif && (
+          <Animated.View style={{
+            ...StyleSheet.absoluteFillObject,
+            backgroundColor:'rgba(3,2,16,0.97)',
+            alignItems:'center', justifyContent:'center',
+            opacity: consultAnim,
+            zIndex:999,
+          }}>
+            {/* Glow de fundo */}
+            <View pointerEvents="none" style={{
+              position:'absolute',
+              width:320, height:320, borderRadius:160,
+              backgroundColor: NEON_PURPLE, opacity:0.05,
+            }} />
+            <View pointerEvents="none" style={{
+              position:'absolute',
+              width:200, height:200, borderRadius:100,
+              backgroundColor: NEON_BLUE, opacity:0.06,
+              transform:[{ translateX: 60 }, { translateY: -40 }],
+            }} />
+
+            {/* Ícone central girando */}
+            <View style={{ position:'relative', width:120, height:120, alignItems:'center', justifyContent:'center', marginBottom:36 }}>
+              {/* Anel externo girando */}
+              <Animated.View style={{
+                position:'absolute', width:118, height:118, borderRadius:59,
+                borderWidth:2, borderColor: NEON_PURPLE,
+                borderTopColor:'transparent',
+                transform:[{ rotate: spinRot }],
+                shadowColor: NEON_PURPLE, shadowOpacity:0.8, shadowRadius:20,
+              }} />
+              {/* Anel interno contra-girando */}
+              <Animated.View style={{
+                position:'absolute', width:90, height:90, borderRadius:45,
+                borderWidth:1.5, borderColor: NEON_CYAN,
+                borderBottomColor:'transparent',
+                transform:[{ rotate: spinRot.interpolate({ inputRange:[0,1], outputRange:['360deg','0deg'] }) }],
+              }} />
+              {/* Core do ícone */}
+              <View style={{
+                width:66, height:66, borderRadius:33,
+                backgroundColor: NEON_PURPLE+'1A',
+                borderWidth:2, borderColor: NEON_PURPLE+'60',
+                alignItems:'center', justifyContent:'center',
+                shadowColor: NEON_PURPLE, shadowOpacity:0.9, shadowRadius:28,
+              }}>
+                <MaterialCommunityIcons name="barcode-scan" size={30} color={NEON_PURPLE} />
+              </View>
+
+              {/* Badge fonte ativa */}
+              <Animated.View style={{
+                position:'absolute', bottom:2, right:2,
+                width:32, height:32, borderRadius:11,
+                backgroundColor: src.color,
+                alignItems:'center', justifyContent:'center',
+                borderWidth:2.5, borderColor:'rgba(3,2,16,0.95)',
+                shadowColor: src.color, shadowOpacity:0.9, shadowRadius:12,
+                transform:[{ scale: srcPulse }],
+              }}>
+                <Feather name={src.icon} size={13} color="#FFF" />
+              </Animated.View>
+            </View>
+
+            {/* Texto principal */}
+            <Text style={{ color:'#FFF', fontSize:22, fontWeight:'900', letterSpacing:-0.5, marginBottom:4, textAlign:'center' }}>
+              Consultando{'.'.repeat(dotCount)}
+            </Text>
+            <Text style={{ color:'rgba(255,255,255,0.35)', fontSize:12, fontWeight:'600', marginBottom:20, textAlign:'center' }}>
+              {src.label}
+            </Text>
+
+            {/* Barra de progresso */}
+            <ScanProgressBar prog={consultProg} color={NEON_PURPLE} />
+
+            {/* Pills das fontes */}
+            <View style={{ flexDirection:'row', gap:8, marginTop:24, flexWrap:'wrap', justifyContent:'center', paddingHorizontal:24 }}>
+              {SOURCES.map((s, i) => (
+                <Animated.View key={i} style={{
+                  flexDirection:'row', alignItems:'center', gap:5,
+                  paddingHorizontal: i === srcIdx ? 13 : 9, paddingVertical:7,
+                  backgroundColor: i === srcIdx ? s.color+'22' : 'rgba(255,255,255,0.05)',
+                  borderRadius:18, borderWidth:1.5,
+                  borderColor: i === srcIdx ? s.color+'70' : 'rgba(255,255,255,0.10)',
+                  transform:[{ scale: i === srcIdx ? srcPulse : new Animated.Value(1) }],
+                }}>
+                  <Feather name={s.icon} size={10} color={i === srcIdx ? s.color : 'rgba(255,255,255,0.30)'} />
+                  {i === srcIdx && (
+                    <Text style={{ color: s.color, fontWeight:'800', fontSize:11, letterSpacing:0.1 }}>{s.label}</Text>
+                  )}
+                </Animated.View>
+              ))}
+            </View>
+
+            {/* Rodapé */}
+            <Text style={{ color:'rgba(255,255,255,0.18)', fontSize:10.5, fontWeight:'600', marginTop:32, letterSpacing:0.5 }}>
+              GEI · PAINEL DE ESTOQUE INTELIGENTE
+            </Text>
+          </Animated.View>
+        )}
+
       </View>
     </Modal>
   );
 };
+
 
 // ════════════════════════════════════════════════════════════════════════════
 //  ROBOBGIF PREMIUM  ─  Substitui o <Modal visible={showRoboGif}> antigo
@@ -10721,9 +10995,11 @@ export default function App() {
     const newQty = currentQty + addQty;
     setBusy(true); setBusyMsg('Atualizando quantidade...');
     try {
-      await secureAxiosInstance.patch(`https://api.baserow.io/api/database/rows/table/${tableId}/${product.id}/?user_field_names=true`, { quantidade: String(newQty) });
+      const novaDataEnvio = new Date().toLocaleDateString('pt-BR');
+      const novaPrevisao = calculatePrevisao(newQty, product.MARGEM || 'Medio giro', novaDataEnvio);
+      await secureAxiosInstance.patch(`https://api.baserow.io/api/database/rows/table/${tableId}/${product.id}/?user_field_names=true`, { quantidade: String(newQty), DATAENVIO: novaDataEnvio, PREVISAO: novaPrevisao });
       await addAuditLog('PRODUCT_QTY_UPDATED', `Quantidade de "${product.produto}" alterada de ${currentQty} para ${newQty} (+${addQty}) na prateleira ${activeShelf}`, userData?.id);
-      setStockData(prev => sortProductsByDate(prev.map(p => p.id === product.id ? { ...p, quantidade: String(newQty) } : p)));
+      setStockData(prev => sortProductsByDate(prev.map(p => p.id === product.id ? { ...p, quantidade: String(newQty), DATAENVIO: novaDataEnvio, PREVISAO: novaPrevisao } : p)));
     } catch (ex) {
       showErr('Não foi possível atualizar a quantidade. Verifique a conexão.');
     } finally {
@@ -11128,66 +11404,77 @@ export default function App() {
     // Monta lista de marcas/produtos existentes para o sistema reconhecer
     const brandSample = [...new Set(stockData.slice(0, 40).map(s => (s.produto || '').split(' ').slice(0,3).join(' ')))].slice(0, 20).join(', ');
 
-    return 'Voce e o GEI, assistente de IA de gestao de estoque de supermercado. '
-      + 'Personalidade: JARVIS do Homem de Ferro — preciso, direto, sofisticado e proativo. Zero titubear. '
-      + 'NUNCA diga "nao entendi", "pode repetir", "nao consegui". Se algo for ambiguo, deduza pelo contexto e aja. '
-      + 'Para voz: max 2 frases. Para texto: objetivo, sem listas com asteriscos.\n\n'
-      + '=== OPERADOR ===\n'
-      + 'Nome: ' + (userData?.NOME || 'N/A') + '\n'
-      + 'Perfil: ' + perfil + '\n'
-      + 'Area/Setor: ' + (userArea ? shlabel(userArea) : 'N/A') + '\n'
-      + 'Acesso: ' + (isFullAccess ? 'TOTAL — pode cadastrar em qualquer prateleira' : 'RESTRITO — somente prateleira: ' + allowedShelves.map(k => shlabel(k) + '(' + k + ')').join(', ')) + '\n\n'
-      + '=== PRATELEIRAS ===\n'
-      + SHELF_KEYS.map(k => {
-          const allowed = allowedShelves.includes(k);
-          return shlabel(k) + '=' + k + (allowed ? ' [PERMITIDA]' : ' [SEM PERMISSAO]');
-        }).join(', ') + '\n'
-      + 'Prateleira ativa agora: ' + shlabel(activeShelf) + ' (' + activeShelf + ')\n\n'
-      + '=== ESTOQUE ===\n'
-      + 'Total: ' + stockData.length + ' itens\n'
-      + 'Vencendo em 7 dias: ' + (warn || 'nenhum') + '\n'
-      + 'Ja vencidos: ' + (exp || 'nenhum') + '\n'
-      + 'Marcas presentes no estoque: ' + (brandSample || 'nenhuma ainda') + '\n'
-      + 'Detalhes:\n' + (sample || 'vazio') + '\n\n'
-      + '=== REGRAS DE CADASTRO ===\n'
-      + '1. PERMISSAO: O operador SO pode cadastrar nas prateleiras marcadas como [PERMITIDA]. '
-      + (pinnedShelf ? `IMPORTANTE: o operador FIXOU a prateleira ${shlabel(pinnedShelf)} (${pinnedShelf}) — TODO cadastro deve usar essa chave, ignore a categoria do produto. ` : '')
-      + (isFullAccess
-          ? 'Este operador tem acesso total. '
-          : 'NUNCA use prateleira [SEM PERMISSAO]. Se nenhuma prateleira permitida combinar com o produto, escolha a MAIS PROXIMA dentre as permitidas (jamais recuse) — o sistema fara o ajuste final automaticamente. ')
-      + '\n'
-      + '2. NOME DO PRODUTO: Sempre monte o nome mais completo possivel: MARCA + TIPO + VOLUME/PESO + DESCRICAO. '
-      + 'Exemplos: "coca" -> "COCA-COLA 600ML", "leite ninho" -> "LEITE NINHO PO INSTANTANEO 400G", "detergente ype" -> "DETERGENTE YPE NEUTRO 500ML". '
-      + 'Se o produto ja existe no estoque com nome similar, use exatamente o mesmo nome (veja "Marcas presentes no estoque" acima). '
-      + 'Nunca use nome generico como "PRODUTO" ou deixe sem marca se o usuario mencionou.\n'
-      + '3. PRATELEIRA AUTOMATICA: Deduza a prateleira certa pelo tipo de produto (use sempre este consenso): '
-      + 'bebida=tudo que for liquido para beber (refrigerante/suco/agua/cerveja/energetico/cha/isotonico), '
-      + 'frios=laticinios e embutidos (leite/iogurte/queijo/requeijao/manteiga/presunto/mortadela), '
-      + 'biscoito=guloseimas (biscoito/bolacha/chocolate/doce/bala/snack), '
-      + 'macarrao=mercearia/graos secos e temperos (arroz/feijao/macarrao/massa/farinha/azeite/oleo/tempero/molho/extrato/lentilha), '
-      + 'pesado=limpeza/higiene (detergente/sabao/papel/fralda/sabonete/shampoo). '
-      + 'Se nao tiver certeza, use a prateleira ativa (' + activeShelf + '). NUNCA responda que nao entendeu — se a categoria for ambigua, escolha a mais provavel e siga em frente.\n'
-      + '4. VALIDADE: Extraia do que o usuario disse. '
-      + 'Ano < 2020 -> corrija somando 10 (2016->2026). Sem ano -> use ' + new Date().getFullYear() + '. Sem validade -> pergunte. NUNCA invente.\n\n'
-      + '=== FUNCOES ===\n'
-      + 'Cadastrar produto (ja salva e confirma automaticamente, sem perguntar):\n'
-      + '<<<FN:cadastrar_produto>>>{"nome":"NOME COMPLETO","validade":"DD/MM/AAAA","prateleira":"chave"}<<<END>>>\n'
-      + 'Remover produto (remove o ultimo cadastrado pela IA, ou busca por nome):\n'
-      + '<<<FN:remover_produto>>>{"nome":"NOME OU VAZIO PARA ULTIMO CADASTRADO"}<<<END>>>\n'
-      + 'Use remover_produto sempre que o usuario disser "remove", "tira", "apaga", "errado", "nao e esse" apos um cadastro.\n'
-      + 'Consultar prateleira:\n'
-      + '<<<FN:consultar_prateleira>>>{"prateleira":"chave"}<<<END>>>\n'
-      + '\n=== UI DINAMICA NO CHAT ===\n'
-      + 'Voce pode renderizar componentes interativos no chat usando blocos UI. Use APENAS quando agregar valor (ex: pedir confirmacao com botoes, mostrar tabela comparativa).\n'
-      + 'Botoes de escolha:\n'
-      + '<<<UI:choice>>>{"question":"Texto curto","options":[{"label":"Bebidas","action":"set_shelf","value":"bebida"},{"label":"Cancelar","action":"noop"}]}<<<END>>>\n'
-      + 'Acoes suportadas: set_shelf (troca prateleira ativa e fixa), pin_shelf (fixa a atual), unpin_shelf (libera), retry (reenvia ultima msg), noop.\n'
-      + 'Tabela:\n'
-      + '<<<UI:table>>>{"title":"Comparativo","columns":["Produto","Validade"],"rows":[["Coca 2L","15/03/26"]]}<<<END>>>\n'
-      + 'Lista de cards:\n'
-      + '<<<UI:list>>>{"title":"Sugestoes","items":[{"icon":"package","title":"X","subtitle":"Y"}]}<<<END>>>\n\n'
-      + 'REGRA FINAL: Se faltar algum dado essencial (validade), pergunte UMA vez, direto. Nada mais.\n'
-      + 'REGRA DE OURO — EXECUCAO: NUNCA diga "vou cadastrar", "irei cadastrar", "cadastrarei" sem emitir IMEDIATAMENTE, na MESMA resposta, o bloco <<<FN:cadastrar_produto>>>...<<<END>>>. Declarar a intencao sem o bloco e considerado falha. Se voce ja decidiu o nome, a validade e a prateleira, emita o bloco JA, sem confirmacoes extras.';
+    return (
+      'IDENTIDADE: Voce e o GEI, assistente de estoque de supermercado. ' +
+      'Personalidade: direto, eficaz, zero enrolacao. Nao titubeie. Nao explique o que vai fazer — FACA.\n\n' +
+
+      '=== OPERADOR ===\n' +
+      'Nome: ' + (userData?.NOME || 'N/A') + '\n' +
+      'Perfil: ' + perfil + '\n' +
+      'Area: ' + (userArea ? shlabel(userArea) : 'N/A') + '\n' +
+      'Acesso: ' + (isFullAccess ? 'TOTAL' : 'RESTRITO — apenas: ' + allowedShelves.map(k => shlabel(k) + '(' + k + ')').join(', ')) + '\n\n' +
+
+      '=== PRATELEIRAS DISPONIVEIS ===\n' +
+      SHELF_KEYS.map(k => shlabel(k) + '=' + k + (allowedShelves.includes(k) ? ' ✓' : ' ✗')).join(' | ') + '\n' +
+      'Prateleira ativa: ' + shlabel(activeShelf) + ' (' + activeShelf + ')' +
+      (pinnedShelf ? ' [FIXADA — use sempre esta]' : '') + '\n\n' +
+
+      '=== ESTOQUE ATUAL ===\n' +
+      'Total: ' + stockData.length + ' itens | ' +
+      'Vencendo 7d: ' + (warn || 'nenhum') + ' | Vencidos: ' + (exp || 'nenhum') + '\n' +
+      (sample ? 'Amostra:\n' + sample + '\n' : '') + '\n' +
+
+      '=== MAPEAMENTO DE CATEGORIAS ===\n' +
+      'bebida = refrigerante, suco, agua, cerveja, energetico, cha, isotonico, kombucha, vinho\n' +
+      'frios  = leite, iogurte, queijo, requeijao, manteiga, presunto, mortadela, salsicha, frios\n' +
+      'biscoito = biscoito, bolacha, chocolate, doce, bala, snack, wafer, pirulito, chiclete\n' +
+      'macarrao = arroz, feijao, macarrao, massa, farinha, azeite, oleo, tempero, molho, extrato, lentilha, quinoa\n' +
+      'pesado = detergente, sabao, desinfetante, papel, fralda, sabonete, shampoo, condicionador, amaciante\n\n' +
+
+      '=== FUNCOES DE ACAO ===\n' +
+      'CADASTRAR PRODUTO:\n' +
+      '<<<FN:cadastrar_produto>>>{\"nome\":\"NOME COMPLETO\",\"validade\":\"DD/MM/AAAA\",\"prateleira\":\"chave\"}<<<END>>>\n\n' +
+      'REMOVER PRODUTO (ultimo cadastrado ou por nome):\n' +
+      '<<<FN:remover_produto>>>{\"nome\":\"NOME OU VAZIO\"}<<<END>>>\n\n' +
+      'CONSULTAR PRATELEIRA:\n' +
+      '<<<FN:consultar_prateleira>>>{\"prateleira\":\"chave\"}<<<END>>>\n\n' +
+
+      '=== REGRAS ABSOLUTAS DE CADASTRO ===\n\n' +
+
+      'REGRA 1 — ACAO IMEDIATA:\n' +
+      'Quando o usuario pedir para cadastrar um produto E voce souber o nome E a validade:\n' +
+      'EMITA O BLOCO <<<FN:cadastrar_produto>>> IMEDIATAMENTE NA MESMA RESPOSTA.\n' +
+      'NAO existe "vou cadastrar", "estou cadastrando", "produto sera registrado" sem o bloco.\n' +
+      'O bloco FN e a UNICA prova de que o cadastro aconteceu. Sem ele = nada foi feito.\n\n' +
+
+      'REGRA 2 — NOME DO PRODUTO:\n' +
+      'Sempre: MARCA + TIPO + VOLUME/PESO. Exemplos:\n' +
+      '"coca" → "COCA-COLA 600ML" | "leite ninho" → "LEITE NINHO 400G" | "ype" → "DETERGENTE YPE 500ML"\n' +
+      'Se o usuario disse um nome especifico, use-o. Nunca coloque apenas "PRODUTO".\n\n' +
+
+      'REGRA 3 — VALIDADE:\n' +
+      'Extraia exatamente o que o usuario disse. Se o ano for < 2020, some 10 (2016→2026).\n' +
+      'Formato final: DD/MM/AAAA. Sem validade → pergunte UMA vez, curto.\n\n' +
+
+      'REGRA 4 — PRATELEIRA:\n' +
+      'Deduza pelo tipo do produto usando o MAPEAMENTO acima.\n' +
+      'Se pinnedShelf estiver ativa, use SEMPRE ela.\n' +
+      'Nunca use prateleira marcada com ✗.\n\n' +
+
+      'REGRA 5 — FLUXO CORRETO:\n' +
+      'Usuario: "coloca coca-cola 600ml validade 15/07/2026"\n' +
+      'CORRETO: "✅ Cadastrado." + <<<FN:cadastrar_produto>>>{\"nome\":\"COCA-COLA 600ML\",\"validade\":\"15/07/2026\",\"prateleira\":\"bebida\"}<<<END>>>\n' +
+      'ERRADO: "Coca-Cola 600ml, valida até 15/07/2026, está sendo cadastrada na prateleira Bebidas." (SEM BLOCO = FALHA)\n\n' +
+
+      'REGRA 6 — AMBIGUIDADE:\n' +
+      'Nunca diga "nao entendi", "pode repetir", "nao consegui".\n' +
+      'Se for ambiguo, deduza pelo contexto, aja, e informe o que fez.\n\n' +
+
+      'REGRA 7 — MODO VOZ:\n' +
+      'Maximo 2 frases curtas. Zero markdown.\n\n' +
+
+      'LEMBRE-SE: O bloco <<<FN:cadastrar_produto>>> e OBRIGATORIO sempre que houver cadastro. SEMPRE.'
+    );
   };
 
   const jarvisExecuteFn = async (name, args) => {
@@ -11411,13 +11698,13 @@ export default function App() {
   };
 
   // ── Motor de chamada à IA (raw, sem histórico) ────────────────────────────
-  const _callAIRaw = async (sysText, history, maxTok) => {
+  const _callAIRaw = async (sysText, history, maxTok, temperature = 0.15) => {
     let raw = '';
     const tryGemini = async (model) => {
       const body = {
         system_instruction: { parts: [{ text: sysText }] },
         contents: history,
-        generationConfig: { temperature: 0.7, maxOutputTokens: maxTok }
+        generationConfig: { temperature, maxOutputTokens: maxTok }
       };
       const r = await fetchWithTimeout(
         'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + RT_API_KEY_IA,
@@ -11439,7 +11726,7 @@ export default function App() {
       const r = await fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + GROQ_API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, messages, max_tokens: maxTok, temperature: 0.7 })
+        body: JSON.stringify({ model, messages, max_tokens: maxTok, temperature })
       }, 7000);
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const d = await r.json();
@@ -11477,152 +11764,266 @@ export default function App() {
 
   const callJarvis = async (userText, isVoice) => {
     const sysText = JARVIS_SYSTEM() + (isVoice ? ' MODO VOZ: maximo 2 frases curtas, zero markdown.' : '');
-    const maxTok = isVoice ? 200 : 800;
+    const maxTok  = isVoice ? 200 : 800;
+    const jarvisTempLow = 0.10; // Temperatura baixa = mais determinístico, segue instruções
 
-    jarvisHistoryRef.current = [...jarvisHistoryRef.current, { role: 'user', parts: [{ text: userText }] }];
+    jarvisHistoryRef.current = [...jarvisHistoryRef.current, { role:'user', parts:[{ text: userText }] }];
     if (jarvisHistoryRef.current.length > 40) jarvisHistoryRef.current = jarvisHistoryRef.current.slice(-30);
 
-    // Transparência: Mostra o que a IA está analisando antes de chamar a API
-    const initialThinkId = Date.now() + 777;
-    setMsgs(p => [...p, { id: initialThinkId, text: '🧠 Analisando sua solicitação...', isAi: true, thinking: true }]);
+    // ── Extrai dados do produto da mensagem do usuário (antes de chamar a IA)
+    //    Se o usuário já enviou nome + validade, temos o suficiente para cadastrar.
+    const _parseUserMsg = (txt) => {
+      const t = String(txt || '');
+      const monthMap = {
+        jan:1,fev:2,mar:3,abr:4,mai:5,jun:6,jul:7,ago:8,set:9,out:10,nov:11,dez:12,
+        janeiro:1,fevereiro:2,'março':3,abril:4,maio:5,junho:6,julho:7,agosto:8,
+        setembro:9,outubro:10,novembro:11,dezembro:12
+      };
 
-    let raw = await _callAIRaw(sysText, jarvisHistoryRef.current, maxTok);
-    
-    // Remove o "pensando" inicial
-    setMsgs(p => p.filter(m => m.id !== initialThinkId));
+      const parseYear = (y) => {
+        let s = String(y).replace(/\D/g,'');
+        if (s.length === 5 && s.startsWith('20')) s = '20' + s.slice(3); // "20127" → "2027"
+        if (s.length > 4) s = s.slice(0,4);
+        let yr = parseInt(s,10);
+        if (s.length <= 2) yr = 2000 + yr;
+        if (yr < 2020) yr += 10;
+        return yr;
+      };
 
-    if (!raw?.trim()) raw = 'Sem conexao com a IA no momento. Tente novamente em instantes.';
+      let validade = null;
+      // Formato: "15/03/2027" ou "15-3-27"
+      const d1 = t.match(/\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,5})\b/);
+      // Formato: "15 dos 3 de 2027" / "15 de março de 2027" / "15 03 2027"
+      const d2 = t.match(/\b(\d{1,2})\s+(?:de\s+|dos?\s+|do\s+)?(\d{1,2}|jan(?:eiro)?|fev(?:ereiro)?|mar(?:ço)?|abr(?:il)?|mai(?:o)?|jun(?:ho)?|jul(?:ho)?|ago(?:sto)?|set(?:embro)?|out(?:ubro)?|nov(?:embro)?|dez(?:embro)?)\s+(?:de\s+|dos?\s+)?(\d{4,5})\b/i);
+      // Formato: "março de 2027" / "março/2027"
+      const d3 = t.match(/\b(jan(?:eiro)?|fev(?:ereiro)?|mar(?:ço)?|abr(?:il)?|mai(?:o)?|jun(?:ho)?|jul(?:ho)?|ago(?:sto)?|set(?:embro)?|out(?:ubro)?|nov(?:embro)?|dez(?:embro)?)\s*(?:de\s+|\/)?(\d{4,5})\b/i);
 
-    // ── AUTO-CORREÇÃO: IA explicou que ia corrigir mas não cadastrou ──────────
-    // Injeta bolha de "pensando" com typewriter e dispara prompt automático.
+      if (d1) {
+        const day = parseInt(d1[1],10), mon = parseInt(d1[2],10), yr = parseYear(d1[3]);
+        validade = String(day).padStart(2,'0')+'/'+String(mon).padStart(2,'0')+'/'+yr;
+      } else if (d2) {
+        const day = parseInt(d2[1],10);
+        let mon = parseInt(d2[2],10);
+        if (isNaN(mon)) mon = monthMap[d2[2].toLowerCase().slice(0,3)] || 1;
+        const yr = parseYear(d2[3]);
+        validade = String(day).padStart(2,'0')+'/'+String(mon).padStart(2,'0')+'/'+yr;
+      } else if (d3) {
+        const mon = monthMap[d3[1].toLowerCase().slice(0,3)] || 1;
+        const yr = parseYear(d3[2]);
+        validade = '01/'+String(mon).padStart(2,'0')+'/'+yr;
+      }
+
+      // ── Intent de cadastro ─────────────────────────────────────────────────
+      const hasCadastroIntent =
+        /(coloc[ao]|cadastr[ao]|adicion[ao]|registr[ao]|inclu[ií]|bot[ao]|lan[çc][ao]|salv[ao]|inser[ei])\b/i.test(t) ||
+        /(quero|preciso|pode|vai|vou|tem que)\s+(cadastrar|adicionar|colocar|registrar|incluir|lançar|salvar)/i.test(t) ||
+        /é\s+(só|somente)\s+no\s+produto/i.test(t);
+
+      // ── Nome do produto ────────────────────────────────────────────────────
+      // StopWords: onde o nome termina (não corta em preposições como "del", "da", "do")
+      const stopRe = /\s+(?:com\s+a\s+val|com\s+val|a\s+val|val(?:idade)?(?:\s+|$)|venc(?:imento)?(?:\s+|$)|\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,5}|\d{1,2}\s+d[eo]s?\s+\d|\d{1,2}\s+de\s+(?:jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez))/i;
+
+      let nome = null;
+      // Após verbo de cadastro
+      const verbRe = /(?:coloc[ao]|cadastr[ao]|adicion[ao]|registr[ao]|bot[ao]|lan[çc][ao]|salv[ao]|inser[ei])\s+(?:um[ao]?\s+|o\s+produto\s+|a\s+produto\s+|os?\s+produto\s+|uma?\s+produto\s+|[ao]\s+)?/i;
+      const verbMatch = t.match(verbRe);
+      if (verbMatch) {
+        const afterVerb = t.slice(verbMatch.index + verbMatch[0].length);
+        const stopMatch = afterVerb.match(stopRe);
+        const raw = (stopMatch ? afterVerb.slice(0, stopMatch.index) : afterVerb.slice(0, 65)).trim().replace(/\s+/g,' ').replace(/[,\.]+$/,'');
+        if (raw.length >= 3) nome = raw.toUpperCase();
+      }
+      // Fallback: "produto X" / "é só no produto X"
+      if (!nome) {
+        const np = t.match(/(?:é\s+só\s+(?:no\s+)?produto|produto|item)\s+([A-Za-záêéíóúãõç0-9\s\-\.]{3,60?}?)(?:\s+(?:com|de|a)\s+(?:a\s+)?val|\s+venc|\s+\d{1,2}\/|$)/i);
+        if (np?.[1]) nome = np[1].trim().toUpperCase();
+      }
+
+      return { validade, nome, hasCadastroIntent };
+    };
+
+    const userParsed = _parseUserMsg(userText);
+
+    // ── Thinking indicator
+    const thinkId = Date.now() + 777;
+    setMsgs(p => [...p, { id: thinkId, text:'🧠 Processando...', isAi:true, thinking:true }]);
+
+    // ACAO DIRETA: se temos nome + validade + intenção da mensagem do usuário → cadastra SEM chamar IA
+    if (userParsed.hasCadastroIntent && userParsed.nome && userParsed.validade) {
+      console.log('[JARVIS] Dados completos extraídos do usuário — cadastro direto SEM IA:', userParsed.nome, userParsed.validade);
+      const thinkId2 = Date.now() + 100;
+      setMsgs(p => [...p, { id: thinkId2, text: '⚙️ Cadastrando...', isAi: true, thinking: true }]);
+      try {
+        const shelf = _smartResolveShelf(userParsed.nome, null);
+        const r = await jarvisExecuteFn('cadastrar_produto', { nome: userParsed.nome, validade: userParsed.validade, prateleira: shelf });
+        setMsgs(p => p.filter(m => m.id !== thinkId2));
+        const finalReply = String(r || '✅ Cadastrado.');
+        jarvisHistoryRef.current = [...jarvisHistoryRef.current, { role: 'model', parts: [{ text: finalReply }] }];
+        return finalReply;
+      } catch (eDirect) {
+        setMsgs(p => p.filter(m => m.id !== thinkId2));
+        console.warn('[JARVIS] cadastro direto falhou, tentando via IA:', eDirect.message);
+        // Continua para a chamada da IA como fallback
+      }
+    }
+
+    let raw = await _callAIRaw(sysText, jarvisHistoryRef.current, maxTok, jarvisTempLow);
+    setMsgs(p => p.filter(m => m.id !== thinkId));
+
+    if (!raw?.trim()) raw = 'Sem conexao com a IA. Tente novamente.';
+
+    // ── AUTO-CORREÇÃO DE DATA ────────────────────────────────────────────────
     if (_javisIsDateCorrection(raw)) {
-      console.log('[JARVIS] Detectou intenção de correção de data — disparando auto-fix.');
-
-      // 1. Mostra bolha animada de "corrigindo automaticamente"
-      const thinkId = Date.now() + 500;
-      const thinkSteps = [
-        '🔍 Analisando data informada...',
-        '🔍 Analisando data informada...\n⚙️ Detectado ano improvável para produto de mercado.',
-        '🔍 Analisando data informada...\n⚙️ Detectado ano improvável para produto de mercado.\n🛠️ Aplicando correção automática...',
-        '🔍 Analisando data informada...\n⚙️ Detectado ano improvável para produto de mercado.\n🛠️ Aplicando correção automática...\n✅ Confirmando cadastro...',
-      ];
-      setMsgs(p => [...p, { id: thinkId, text: thinkSteps[0], isAi: true, thinking: true }]);
-
-      // Anima os steps do typewriter com delays
-      let stepIdx = 0;
-      const animateSteps = () => new Promise(res => {
-        const next = () => {
-          stepIdx++;
-          if (stepIdx >= thinkSteps.length) { res(); return; }
-          setMsgs(p => p.map(m => m.id === thinkId ? { ...m, text: thinkSteps[stepIdx] } : m));
-          setTimeout(next, 600 + Math.random() * 300);
-        };
-        setTimeout(next, 700);
-      });
-
-      // 2. Enquanto anima, dispara o prompt de auto-correção em paralelo
-      const autoFixPrompt =
-        '[SISTEMA — AÇÃO AUTOMÁTICA] ' +
-        'O usuário pediu para cadastrar um produto mas a data continha um ano inválido (ex: 2016 em vez de 2026). ' +
-        'Aplique a correção de ano automaticamente (ano < 2020 → soma 10) e cadastre o produto AGORA. ' +
-        'Não explique, não pergunte. Apenas emita o bloco de função com a data corrigida. ' +
-        'Resposta permitida: apenas o bloco <<<FN:cadastrar_produto>>>...<<<END>>> e uma frase curtíssima de confirmação.';
-      
-      // Transparência: Mostra o prompt de correção que a IA está gerando
-      const promptLogId = Date.now() + 888;
-      setMsgs(p => [...p, { id: promptLogId, text: `🛠️ Sistema gerando prompt de auto-correção...`, isAi: true, system: true }]);
-      setTimeout(() => {
-        setMsgs(p => p.map(m => m.id === promptLogId ? { ...m, text: `🛠️ Prompt enviado: "${autoFixPrompt.slice(0, 80)}..."` } : m));
-      }, 1500);
-
+      console.log('[JARVIS] Correção de data detectada — auto-fix.');
+      const fixThinkId = Date.now() + 500;
+      setMsgs(p => [...p, { id: fixThinkId, text:'⚙️ Corrigindo data e cadastrando...', isAi:true, thinking:true }]);
       const autoHistory = [
         ...jarvisHistoryRef.current,
-        { role: 'model', parts: [{ text: raw }] },
-        { role: 'user', parts: [{ text: autoFixPrompt }] },
+        { role:'model', parts:[{ text: raw }] },
+        { role:'user', parts:[{ text:
+          '[SISTEMA] Corrija o ano automaticamente (< 2020 → soma 10) e emita AGORA:\n' +
+          '<<<FN:cadastrar_produto>>>{\"nome\":\"...\",\"validade\":\"DD/MM/AAAA\",\"prateleira\":\"chave\"}<<<END>>>\n' +
+          'Apenas o bloco, nada mais.'
+        }] },
       ];
-      const autoSys = JARVIS_SYSTEM() +
-        ' MODO AUTO-CORREÇÃO: a data foi detectada como inválida pelo sistema. ' +
-        'Corrija o ano automaticamente e emita o bloco <<<FN:cadastrar_produto>>> imediatamente. ' +
-        'Sem perguntas, sem explicações longas.';
-
-      const [autoRaw] = await Promise.all([
-        _callAIRaw(autoSys, autoHistory, 400),
-        animateSteps(),
-      ]);
-
-      // 3. Remove bolha de pensamento
-      setMsgs(p => p.filter(m => m.id !== thinkId));
-
-      // 4. Processa a resposta de auto-correção
-      const fixedFnMatch = autoRaw?.match(/<<<FN:(\w+)>>>([\s\S]*?)<<<END>>>/);
-      let fixedReply = (autoRaw || '').replace(/<<<FN:\w+>>>[\s\S]*?<<<END>>>/g, '').trim();
-
-      if (fixedFnMatch) {
+      const autoRaw = await _callAIRaw(JARVIS_SYSTEM(), autoHistory, 300, 0.05);
+      setMsgs(p => p.filter(m => m.id !== fixThinkId));
+      const fixFn = autoRaw?.match(/<<<FN:(\w+)>>>([\s\S]*?)<<<END>>>/);
+      if (fixFn) {
         try {
-          const result = await jarvisExecuteFn(fixedFnMatch[1], JSON.parse(fixedFnMatch[2].trim()));
-          if (result) fixedReply = String(result);
-        } catch (e) { console.warn('[JARVIS] auto-fix fn error:', e.message); }
+          const r = await jarvisExecuteFn(fixFn[1], JSON.parse(fixFn[2].trim()));
+          const final = String(r || '');
+          jarvisHistoryRef.current = [...autoHistory, { role:'model', parts:[{ text: final }] }];
+          return final;
+        } catch(e) { console.warn('[JARVIS] autofix exec error:', e.message); }
       }
-
-      const finalReply = fixedReply || 'Produto cadastrado com data corrigida.';
-      jarvisHistoryRef.current = [...autoHistory, { role: 'model', parts: [{ text: finalReply }] }];
-      return finalReply;
+      // Fallback: usa dados extraídos do usuário
+      if (userParsed.nome && userParsed.validade) {
+        const shelf = _smartResolveShelf(userParsed.nome, null);
+        const r = await jarvisExecuteFn('cadastrar_produto', { nome: userParsed.nome, validade: userParsed.validade, prateleira: shelf });
+        jarvisHistoryRef.current = [...autoHistory, { role:'model', parts:[{ text: String(r||'') }] }];
+        return String(r || 'Cadastrado com correção de data.');
+      }
     }
 
-    // ── Fluxo normal ─────────────────────────────────────────────────────────
+    // ── Tenta extrair bloco FN da resposta normal
     let fnMatch = raw.match(/<<<FN:(\w+)>>>([\s\S]*?)<<<END>>>/);
-    let reply = raw.replace(/<<<FN:\w+>>>[\s\S]*?<<<END>>>/g, '').trim();
+    let reply   = raw.replace(/<<<FN:\w+>>>[\s\S]*?<<<END>>>/g, '').trim();
 
-    // ── AUTO-PROMPT: IA declarou intencao de cadastrar mas NAO emitiu o bloco FN.
-    //    Ex.: "Vou cadastrar o Sukita na prateleira Bebidas. Validade 13/06/2026."
-    //    Reenviamos um prompt curto exigindo somente o bloco <<<FN:cadastrar_produto>>>.
+    // ── INTERCEPTAÇÃO: IA falou mas não agiu ────────────────────────────────
+    // Detecta se a IA declarou intenção de cadastro sem emitir o bloco FN.
+    // Estratégia: 3 níveis em cascata:
+    //   1. Extrai dados da RESPOSTA da IA
+    //   2. Extrai dados da MENSAGEM DO USUÁRIO
+    //   3. Pede para a IA re-emitir com prompt cirúrgico (última chance)
     if (!fnMatch) {
       const low = (raw || '').toLowerCase();
-      const intentRe = /(vou cadastrar|irei cadastrar|cadastrarei|cadastrando|vou registrar|registrarei|vou adicionar|adicionarei|vou inserir|inserirei|vou colocar)/;
-      const hasProductHints = /(validade|prateleira|vencimento|venc\.)/i.test(raw);
-      if (intentRe.test(low) && hasProductHints) {
-        console.log('[JARVIS] Intencao de cadastro sem bloco FN — disparando auto-prompt.');
-        const forceId = Date.now() + 909;
-        setMsgs(p => [...p, { id: forceId, text: '⚙️ Executando cadastro automaticamente...', isAi: true, system: true, thinking: true }]);
-        const forcePrompt =
-          '[SISTEMA — ACAO OBRIGATORIA] Voce acabou de declarar que ira cadastrar o produto, ' +
-          'mas NAO emitiu o bloco de funcao. Emita AGORA, como UNICA resposta, apenas o bloco ' +
-          '<<<FN:cadastrar_produto>>>{"nome":"...","validade":"DD/MM/AAAA","prateleira":"chave"}<<<END>>> ' +
-          'usando exatamente os dados da sua ultima mensagem (nome, validade e prateleira ja escolhida). ' +
-          'Sem texto antes ou depois, sem perguntas, sem explicacoes.';
-        const forceHistory = [
-          ...jarvisHistoryRef.current,
-          { role: 'model', parts: [{ text: raw }] },
-          { role: 'user', parts: [{ text: forcePrompt }] },
-        ];
-        try {
-          const forceRaw = await _callAIRaw(JARVIS_SYSTEM(), forceHistory, 300);
-          setMsgs(p => p.filter(m => m.id !== forceId));
-          const forcedFn = forceRaw && forceRaw.match(/<<<FN:(\w+)>>>([\s\S]*?)<<<END>>>/);
-          if (forcedFn) {
-            fnMatch = forcedFn;
-            const forcedClean = forceRaw.replace(/<<<FN:\w+>>>[\s\S]*?<<<END>>>/g, '').trim();
-            if (forcedClean) reply = (reply ? reply + '\n' : '') + forcedClean;
-            jarvisHistoryRef.current = forceHistory;
-          }
-        } catch (e) {
-          setMsgs(p => p.filter(m => m.id !== forceId));
-          console.warn('[JARVIS] auto-prompt falhou:', e.message);
+
+      // Detecção ampla de intenção de cadastro na resposta da IA
+      const iaDeclarou =
+        /(vou cadastrar|irei cadastrar|cadastrarei|cadastrando|vou registrar|registrarei|vou adicionar|adicionarei|vou inserir|inserirei|vou colocar|estou cadastrando|estou registrando|considerando o produto|cadastrando na prateleira|cadastro na prateleira|está sendo cadastra|já está cadastra|está cadastra)/i.test(raw) ||
+        /(será cadastrado|foi cadastrado|cadastrado(?:\s+com sucesso)?|pronto(?:\s+para cadastrar)?|produto(?:\s+\w+)?\s+cadastrado)/i.test(raw);
+
+      // Tem algum dado de produto (validade ou prateleira) na resposta
+      const temDadosProduto = /(\d{2}\/\d{2}\/20\d{2}|validade|prateleira|vencimento|\/202[0-9])/i.test(raw);
+
+      if (iaDeclarou || (userParsed.hasCadastroIntent && userParsed.nome && userParsed.validade)) {
+        console.log('[JARVIS] IA declarou cadastro sem FN — interceptando.');
+        const intercId = Date.now() + 909;
+        setMsgs(p => [...p, { id: intercId, text:'⚙️ Finalizando cadastro...', isAi:true, thinking:true }]);
+
+        // Nível 1: extrai dados da RESPOSTA da IA
+        const _extractFromText = (txt) => {
+          const d = txt.match(/\b(\d{2}\/\d{2}\/20\d{2})\b/);
+          const s = txt.match(/\b(bebida|frios|biscoito|macarrao|macarrão|pesado)\b/i);
+          // Nome: tenta vários padrões específicos
+          let n = null;
+          const pats = [
+            /produto\s+([A-ZÀ-Ú][A-ZÀ-Úa-zà-ú0-9\s\-\.]{2,45}?)(?:\s*,|\s+(?:com|de|e|a|até|val|vali|venc|\d))/i,
+            /(?:cadastrar?|registrar?|adicionar?|colocar?)\s+(?:o\s+produto\s+)?([A-ZÀ-Úa-zà-ú0-9\s\-\.]{3,45}?)(?:\s+(?:com|de|na|em|até|val|vali|\d))/i,
+            /([A-Z]{2}[A-Z0-9\s\-\.]{2,40})\s+(?:cadastrado|registrado|adicionado|salvo)/i,
+          ];
+          for (const p of pats) { const m = txt.match(p); if (m?.[1]) { n = m[1].trim(); break; } }
+          return { validade: d?.[1] || null, prateleira: s?.[1]?.toLowerCase() || null, nome: n ? n.toUpperCase() : null };
+        };
+
+        const fromIA   = _extractFromText(raw);
+        // Mescla: IA tem precedência em validade corrigida; usuário em nome (mais limpo)
+        const bestNome    = userParsed.nome    || fromIA.nome    || null;
+        const bestValidade = fromIA.validade   || userParsed.validade || null;
+        const bestShelf    = fromIA.prateleira || (bestNome ? _smartResolveShelf(bestNome, null) : _getAllowedShelves()[0]);
+
+        // Nível 2: temos dados suficientes → cadastra DIRETO sem chamar a IA de novo
+        if (bestNome && bestValidade) {
+          console.log('[JARVIS] Cadastro direto com dados extraídos:', bestNome, bestValidade, bestShelf);
+          setMsgs(p => p.filter(m => m.id !== intercId));
+          try {
+            const r = await jarvisExecuteFn('cadastrar_produto', { nome: bestNome, validade: bestValidade, prateleira: bestShelf });
+            const final = String(r || '');
+            jarvisHistoryRef.current = [...jarvisHistoryRef.current, { role:'model', parts:[{ text: final }] }];
+            return final;
+          } catch(e) { console.warn('[JARVIS] cadastro direto falhou:', e.message); }
         }
+
+        // Nível 3: dados insuficientes → força a IA a re-emitir o bloco (última tentativa)
+        const rePrompt =
+          '[SISTEMA — ACAO IMEDIATA] Voce acabou de descrever um cadastro mas NAO emitiu o bloco de funcao.\n' +
+          'DADOS DISPONÍVEIS:\n' +
+          (bestNome     ? '• nome: "' + bestNome + '"\n' : '') +
+          (bestValidade ? '• validade: "' + bestValidade + '"\n' : '') +
+          (bestShelf    ? '• prateleira: "' + bestShelf + '"\n' : '') +
+          '\nEmita AGORA apenas:\n' +
+          '<<<FN:cadastrar_produto>>>{\"nome\":\"' + (bestNome||'PRODUTO') + '\",\"validade\":\"' + (bestValidade||'01/01/2026') + '\",\"prateleira\":\"' + (bestShelf||_getAllowedShelves()[0]) + '\"}<<<END>>>\n' +
+          'NADA MAIS. Apenas o bloco acima.';
+
+        const reHistory = [
+          ...jarvisHistoryRef.current,
+          { role:'model', parts:[{ text: raw }] },
+          { role:'user',  parts:[{ text: rePrompt }] },
+        ];
+        const reRaw = await _callAIRaw(JARVIS_SYSTEM(), reHistory, 250, 0.05);
+        setMsgs(p => p.filter(m => m.id !== intercId));
+
+        const reFn = reRaw?.match(/<<<FN:(\w+)>>>([\s\S]*?)<<<END>>>/);
+        if (reFn) {
+          try {
+            const r = await jarvisExecuteFn(reFn[1], JSON.parse(reFn[2].trim()));
+            const final = String(r || '');
+            jarvisHistoryRef.current = [...reHistory, { role:'model', parts:[{ text: final }] }];
+            return final;
+          } catch(e) { console.warn('[JARVIS] re-prompt exec error:', e.message); }
+        }
+
+        // Nível 4 (nuclear): se ainda assim não funcionou, cadastra com os melhores dados disponíveis
+        if (bestNome || bestValidade) {
+          const finalNome    = bestNome     || 'PRODUTO SEM NOME';
+          const finalVal     = bestValidade || '01/01/2026';
+          const finalShelf   = bestShelf    || _getAllowedShelves()[0];
+          try {
+            const r = await jarvisExecuteFn('cadastrar_produto', { nome: finalNome, validade: finalVal, prateleira: finalShelf });
+            const final = String(r || '');
+            jarvisHistoryRef.current = [...reHistory, { role:'model', parts:[{ text: final }] }];
+            return final;
+          } catch(e) { console.warn('[JARVIS] nível nuclear falhou:', e.message); }
+        }
+
+        setMsgs(p => p.filter(m => m.id !== intercId));
       }
     }
 
+    // ── Executa bloco FN se presente ────────────────────────────────────────
     if (fnMatch) {
       try {
-        const result = await jarvisExecuteFn(fnMatch[1], JSON.parse(fnMatch[2].trim()));
-        if (result) reply = String(result);
-      } catch (e) { console.warn('[JARVIS] fn call error:', e.message); }
+        const r = await jarvisExecuteFn(fnMatch[1], JSON.parse(fnMatch[2].trim()));
+        if (r) reply = String(r);
+      } catch(e) { console.warn('[JARVIS] fn exec error:', e.message); }
     }
 
     const finalReply = reply || 'Pronto.';
-    jarvisHistoryRef.current = [...jarvisHistoryRef.current, { role: 'model', parts: [{ text: finalReply }] }];
+    jarvisHistoryRef.current = [...jarvisHistoryRef.current, { role:'model', parts:[{ text: finalReply }] }];
     return finalReply;
   };
+
 
 
   // ── Extrai blocos <<<UI:KIND>>>{json}<<<END>>> da resposta da IA ───────────
@@ -11680,7 +12081,9 @@ export default function App() {
         || lowerReply.includes('pode repetir')
         || lowerReply.includes('nao entendi')
         || lowerReply.includes('não entendi');
-      if (isConfused) {
+      // Só re-tenta se NÃO há intenção clara de cadastro (evita loop de cadastro duplo)
+      const txtHasCadastroHint = /(coloc|cadastr|adicion|registr|bot[ao]|lanc)/i.test(txt);
+      if (isConfused && !txtHasCadastroHint) {
         const detected = _detectShelfByProduct(txt);
         const hint = detected
           ? `${txt} (categoria: ${shlabel(detected)})`
